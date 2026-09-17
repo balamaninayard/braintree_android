@@ -19,6 +19,7 @@
     <string name="sepa_direct_debit_button">SEPA Direct Debit</string>
     <string name="cards">Credit or Debit Cards</string>
     <string name="paypal_messaging_button">PayPal Messaging</string>
+    <string name="paypal_saved_payment_method_button">PayPal Saved Payment Method</string>
     <string name="shopper_insights_button">Payment Ready V1</string>
     <string name="shopper_insights_v2_button">Payment Ready V2</string>
     <string name="create_transaction">Create a Transaction</string>
@@ -139,4 +140,48 @@
     <string name="blue_button_color_option">Blue</string>
     <string name="black_button_color_option">Black</string>
     <string name="white_button_color_option">White</string>
+
+    <!-- PayPal Saved Payment Method (View/Edit FI) -->
+    <string name="paypal_saved_payment_method_client_token_label">Client Token</string>
+    <string name="paypal_saved_payment_method_client_token_hint">Paste a client token with paymentMethodIdJwt</string>
+    <string name="paypal_saved_payment_method_amount_label">Amount</string>
+    <string name="paypal_saved_payment_method_flow_label">Flow</string>
+    <string name="paypal_saved_payment_method_flow_continue">Continue</string>
+    <string name="paypal_saved_payment_method_flow_pay_now">Pay Now</string>
+    <string name="paypal_saved_payment_method_load_button">Load component</string>
+    <string name="paypal_saved_payment_method_component_label">PayPalSavedPaymentMethodView</string>
+    <string name="paypal_saved_payment_method_nonce_clear_button">Clear</string>
+    <string name="paypal_saved_payment_method_nonce_placeholder">Nonce updated: %s</string>
+    <string name="paypal_saved_payment_method_missing_token">Enter a client token containing an unexpired paymentMethodIdJwt. Without it the funding instrument fetch fails and only the PayPal brand mark renders.</string>
+    <string name="paypal_saved_payment_method_style_button">Style</string>
+    <string name="paypal_saved_payment_method_style_title">Configure component style</string>
+    <string name="paypal_saved_payment_method_style_show_logo">Show PayPal logo</string>
+    <string name="paypal_saved_payment_method_style_show_label">Show PayPal label</string>
+    <string name="paypal_saved_payment_method_style_show_credit_messaging">Show credit messaging</string>
+    <string name="paypal_saved_payment_method_style_corner_radius_label">Corner radius (dp)</string>
+    <string name="paypal_saved_payment_method_style_border_width_label">Border width (dp)</string>
+    <string name="paypal_saved_payment_method_style_border_color_label">Border color</string>
+    <string name="paypal_saved_payment_method_style_height_label">Height (dp)</string>
+    <string name="paypal_saved_payment_method_style_horizontal_padding_label">Horizontal padding (dp)</string>
+    <string name="paypal_saved_payment_method_style_vertical_padding_label">Vertical padding (dp)</string>
+    <string name="paypal_saved_payment_method_style_background_color_label">Background color</string>
+    <string name="paypal_saved_payment_method_style_text_color_label">Text color</string>
+    <string name="paypal_saved_payment_method_style_base_font_size_label">Base font size (sp)</string>
+    <string name="paypal_saved_payment_method_style_logo_width_label">Logo width (dp)</string>
+    <string name="paypal_saved_payment_method_style_label_font_size_label">Label font size (sp)</string>
+    <string name="paypal_saved_payment_method_style_label_margin_start_label">Label margin start (dp)</string>
+    <string name="paypal_saved_payment_method_style_fi_text_font_size_label">Funding instrument text size (sp)</string>
+    <string name="paypal_saved_payment_method_style_edit_icon_size_label">Edit icon size (dp)</string>
+    <string name="paypal_saved_payment_method_style_fi_margin_start_label">Funding instrument margin start (dp)</string>
+    <string name="paypal_saved_payment_method_style_credit_messaging_font_size_label">Credit messaging font size (sp)</string>
+    <string name="paypal_saved_payment_method_style_credit_messaging_link_color_label">Credit messaging link color</string>
+    <string name="paypal_saved_payment_method_style_pick_color">Pick color</string>
+    <string name="paypal_saved_payment_method_style_use_default">Use default</string>
+    <string name="paypal_saved_payment_method_style_color_picker_title">Pick a color</string>
+    <string name="paypal_saved_payment_method_style_color_hex_hint">#RRGGBB</string>
+    <string name="paypal_saved_payment_method_style_apply_button">Apply &amp; reload</string>
+    <string-array name="paypal_saved_payment_method_flow_options">
+        <item>@string/paypal_saved_payment_method_flow_continue</item>
+        <item>@string/paypal_saved_payment_method_flow_pay_now</item>
+    </string-array>
 </resources>

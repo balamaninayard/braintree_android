@@ -74,6 +74,7 @@ dependencies {
     implementation project(':GooglePay')
     implementation project(':LocalPayment')
     implementation project(':PayPal')
+    implementation project(':PayPalSavedPaymentMethod')
     implementation project(':DataCollector')
     implementation project(':PayPalMessaging')
     implementation project(':ShopperInsights')
