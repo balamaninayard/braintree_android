@@ -3,4 +3,6 @@
     <string name="paypal_saved_payment_method_label">PayPal</string>
     <string name="paypal_saved_payment_method_label_funding_instrument_card_masked_number">••%1$s</string>
     <string name="paypal_saved_payment_method_loading_dialog_message">Sending you to PayPal</string>
+    <string name="paypal_saved_payment_method_edit_content_description">Edit funding instrument</string>
+    <string name="paypal_saved_payment_method_lander_close_content_description">Close</string>
 </resources>

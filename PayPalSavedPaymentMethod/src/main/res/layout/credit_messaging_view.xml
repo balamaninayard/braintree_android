@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View
+        android:id="@+id/paypal_saved_payment_method_credit_messaging_shimmer"
+        android:layout_width="@dimen/paypal_saved_payment_method_credit_messaging_shimmer_width"
+        android:layout_height="@dimen/paypal_saved_payment_method_credit_messaging_shimmer_height"
+        android:background="@drawable/paypal_saved_payment_method_shimmer_bar_background" />
+
+    <TextView
+        android:id="@+id/paypal_saved_payment_method_credit_messaging_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</merge>

@@ -24,7 +24,10 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.R
 @Suppress("LongParameterList")
 internal class PayPalSavedPaymentMethodStyleResolver(style: PayPalSavedPaymentMethodViewStyle, context: Context) {
 
+    internal constructor(context: Context, style: PayPalSavedPaymentMethodViewStyle) : this(style, context)
+
     val showLogo: Boolean = style.showPayPalLogo
+    val showPayPalLogo: Boolean = showLogo
     val showLabel: Boolean = style.showPayPalLabel
     val showCreditMessaging: Boolean = style.showPayPalCreditMessaging
 

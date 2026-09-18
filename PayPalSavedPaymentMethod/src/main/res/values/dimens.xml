@@ -58,4 +58,28 @@
     <dimen name="paypal_saved_payment_method_loading_dialog_spinner_text_spacing">24dp</dimen>
     <dimen name="paypal_saved_payment_method_loading_dialog_text_font_size">17sp</dimen>
     <dimen name="paypal_saved_payment_method_loading_dialog_text_line_height">22sp</dimen>
+
+     <!-- XML View renderer dimensions. -->
+     <dimen name="paypal_saved_payment_method_fi_shimmer_width">80dp</dimen>
+     <dimen name="paypal_saved_payment_method_fi_shimmer_height">16dp</dimen>
+     <dimen name="paypal_saved_payment_method_fi_icon_size">24dp</dimen>
+     <dimen name="paypal_saved_payment_method_fi_text_margin_start">8dp</dimen>
+     <dimen name="paypal_saved_payment_method_fi_edit_icon_size">16dp</dimen>
+     <dimen name="paypal_saved_payment_method_fi_edit_icon_margin_start">8dp</dimen>
+     <dimen name="paypal_saved_payment_method_credit_messaging_shimmer_width">160dp</dimen>
+     <dimen name="paypal_saved_payment_method_credit_messaging_shimmer_height">16dp</dimen>
+     <dimen name="paypal_saved_payment_method_lander_padding">16dp</dimen>
+     <dimen name="paypal_saved_payment_method_lander_close_touch_target_size">32dp</dimen>
+     <dimen name="paypal_saved_payment_method_lander_close_padding">4dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_horizontal_padding">0dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_vertical_padding">10dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_corner_radius">0dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_border_width">0dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_logo_width">24dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_label_font_size">20sp</dimen>
+     <dimen name="paypal_saved_payment_method_default_label_margin_start">6dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_funding_instrument_text_font_size">14sp</dimen>
+     <dimen name="paypal_saved_payment_method_default_edit_icon_size">16dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_funding_instrument_margin_start">12dp</dimen>
+     <dimen name="paypal_saved_payment_method_default_credit_messaging_font_size">16sp</dimen>
 </resources>

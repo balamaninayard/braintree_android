@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PayPalSavedPaymentMethod_BottomSheetDialog" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/PayPalSavedPaymentMethod_BottomSheetAnimation</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="PayPalSavedPaymentMethod_BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/paypal_saved_payment_method_slide_up</item>
+        <item name="android:windowExitAnimation">@anim/paypal_saved_payment_method_slide_down</item>
+    </style>
+</resources>

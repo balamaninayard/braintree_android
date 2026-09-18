@@ -46,6 +46,9 @@
         <action
             android:id="@+id/action_mainFragment_to_payPalSavedPaymentMethodComposeFragment"
             app:destination="@id/payPalSavedPaymentMethodComposeFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_payPalSavedPaymentMethodXmlFragment"
+            app:destination="@id/payPalSavedPaymentMethodXmlFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
@@ -280,6 +283,36 @@
             android:id="@+id/action_payPalSavedPaymentMethodComposeFragment_self"
             app:destination="@id/payPalSavedPaymentMethodComposeFragment"
             app:popUpTo="@id/payPalSavedPaymentMethodComposeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/payPalSavedPaymentMethodXmlFragment"
+        android:name="com.braintreepayments.demo.PayPalSavedPaymentMethodXmlFragment"
+        tools:layout="@layout/fragment_paypal_saved_payment_method_xml">
+        <argument
+            android:name="authString"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="clientToken"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="amount"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="payNow"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="enableAppSwitch"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_payPalSavedPaymentMethodXmlFragment_self"
+            app:destination="@id/payPalSavedPaymentMethodXmlFragment"
+            app:popUpTo="@id/payPalSavedPaymentMethodXmlFragment"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>

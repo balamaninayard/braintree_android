@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/paypal_saved_payment_method_bottom_sheet_background"
+    android:paddingTop="@dimen/paypal_saved_payment_method_lander_padding"
+    android:paddingBottom="@dimen/paypal_saved_payment_method_lander_padding">
+
+    <ImageView
+        android:id="@+id/paypal_saved_payment_method_lander_close"
+        android:layout_width="@dimen/paypal_saved_payment_method_lander_close_touch_target_size"
+        android:layout_height="@dimen/paypal_saved_payment_method_lander_close_touch_target_size"
+        android:layout_gravity="end"
+        android:layout_marginEnd="@dimen/paypal_saved_payment_method_lander_padding"
+        android:padding="@dimen/paypal_saved_payment_method_lander_close_padding"
+        android:src="@drawable/ic_close"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/paypal_saved_payment_method_lander_close_content_description" />
+
+    <WebView
+        android:id="@+id/paypal_saved_payment_method_lander_webview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

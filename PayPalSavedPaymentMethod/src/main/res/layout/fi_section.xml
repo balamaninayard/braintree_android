@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <View
+        android:id="@+id/paypal_saved_payment_method_fi_shimmer"
+        android:layout_width="@dimen/paypal_saved_payment_method_fi_shimmer_width"
+        android:layout_height="@dimen/paypal_saved_payment_method_fi_shimmer_height"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/paypal_saved_payment_method_shimmer_bar_background" />
+
+    <ImageView
+        android:id="@+id/paypal_saved_payment_method_fi_icon"
+        android:layout_width="@dimen/paypal_saved_payment_method_fi_icon_size"
+        android:layout_height="@dimen/paypal_saved_payment_method_fi_icon_size"
+        android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/paypal_saved_payment_method_fi_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        tools:text="@tools:sample/lorem"
+        android:layout_marginStart="@dimen/paypal_saved_payment_method_fi_text_margin_start"
+        android:singleLine="true" />
+
+    <ImageView
+        android:id="@+id/paypal_saved_payment_method_fi_edit_icon"
+        android:layout_width="@dimen/paypal_saved_payment_method_fi_edit_icon_size"
+        android:layout_height="@dimen/paypal_saved_payment_method_fi_edit_icon_size"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/paypal_saved_payment_method_fi_edit_icon_margin_start"
+        android:src="@drawable/ic_edit_pencil"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/paypal_saved_payment_method_edit_content_description" />
+
+</merge>

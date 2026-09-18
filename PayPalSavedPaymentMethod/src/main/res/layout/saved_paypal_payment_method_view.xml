@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/paypal_saved_payment_method_paypal_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_paypal_brand_logo"
+            android:scaleType="fitCenter"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/paypal_saved_payment_method_paypal_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/paypal_saved_payment_method_label" />
+
+        <com.braintreepayments.api.paypalsavedpaymentmethod.component.FiSection
+            android:id="@+id/paypal_saved_payment_method_fi_section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <com.braintreepayments.api.paypalsavedpaymentmethod.component.CreditMessagingView
+        android:id="@+id/paypal_saved_payment_method_credit_messaging"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</merge>

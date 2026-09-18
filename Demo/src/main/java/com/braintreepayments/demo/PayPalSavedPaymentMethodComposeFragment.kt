@@ -59,12 +59,12 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLabelSty
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLogoStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
 
-class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
+open class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
 
     private val args: PayPalSavedPaymentMethodComposeFragmentArgs by navArgs()
     private val nonceState = mutableStateOf<String?>(null)
 
-    override fun onCreateView(
+    open override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,7 +78,7 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalBetaApi::class)
     @Composable
-    private fun PayPalSavedPaymentMethodComposeScreen() {
+    protected fun PayPalSavedPaymentMethodComposeScreen() {
         var clientToken by rememberSaveable(args.clientToken) { mutableStateOf(args.clientToken) }
         var amount by rememberSaveable(args.amount) { mutableStateOf(args.amount) }
         val flowOptions = listOf("Continue", "Pay Now")
