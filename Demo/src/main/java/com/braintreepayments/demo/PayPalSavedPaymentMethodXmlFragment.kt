@@ -1,12 +1,18 @@
 package com.braintreepayments.demo
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.SeekBar
 import android.widget.Spinner
+import androidx.appcompat.app.AlertDialog
 import com.braintreepayments.api.core.ExperimentalBetaApi
 import com.braintreepayments.api.paypal.PayPalCheckoutRequest
 import com.braintreepayments.api.paypal.PayPalPaymentUserAction
@@ -20,6 +26,7 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLabelSty
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLogoStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.core.net.toUri
 import androidx.navigation.fragment.findNavController
@@ -81,6 +88,18 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
         val logoWidth = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_logo_width)
         val labelFontSize = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_label_font_size)
         val labelMarginStart = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_label_margin_start)
+        val fiTextSize = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_fi_text_size)
+        val editIconSize = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_edit_icon_size)
+        val fiMarginStart = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_fi_margin_start)
+        val creditFontSize = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_credit_font_size)
+
+        val borderColor = colorRow(sheet, R.id.paypal_saved_payment_method_xml_style_border_color_preview, R.id.paypal_saved_payment_method_xml_style_border_color_pick, R.id.paypal_saved_payment_method_xml_style_border_color_default)
+        val backgroundColor = colorRow(sheet, R.id.paypal_saved_payment_method_xml_style_background_color_preview, R.id.paypal_saved_payment_method_xml_style_background_color_pick, R.id.paypal_saved_payment_method_xml_style_background_color_default)
+        val textColor = colorRow(sheet, R.id.paypal_saved_payment_method_xml_style_text_color_preview, R.id.paypal_saved_payment_method_xml_style_text_color_pick, R.id.paypal_saved_payment_method_xml_style_text_color_default)
+        val linkColor = colorRow(sheet, R.id.paypal_saved_payment_method_xml_style_link_color_preview, R.id.paypal_saved_payment_method_xml_style_link_color_pick, R.id.paypal_saved_payment_method_xml_style_link_color_default)
+
+        sheet.findViewById<View>(R.id.paypal_saved_payment_method_xml_style_close)
+            .setOnClickListener { dialog.dismiss() }
 
         sheet.findViewById<Button>(R.id.paypal_saved_payment_method_xml_style_apply)
             .setOnClickListener {
@@ -90,6 +109,8 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
                         showPayPalLabel = showLabel.isChecked,
                         showPayPalCreditMessaging = showCredit.isChecked,
                         componentAppearance = ComponentAppearance(
+                            backgroundColor = backgroundColor.color,
+                            textColor = textColor.color,
                             baseFontSizeSp = baseFontSize.floatOrNull()
                         ),
                         container = ContainerStyle(
@@ -97,11 +118,21 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
                             horizontalPaddingDp = horizontalPadding.floatOrNull(),
                             verticalPaddingDp = verticalPadding.floatOrNull(),
                             cornerRadiusDp = cornerRadius.floatOrNull(),
+                            borderColor = borderColor.color,
                             borderWidthDp = borderWidth.floatOrNull(),
                             logo = PayPalLogoStyle(widthDp = logoWidth.floatOrNull()),
                             label = PayPalLabelStyle(
                                 fontSizeSp = labelFontSize.floatOrNull(),
                                 marginStartDp = labelMarginStart.floatOrNull()
+                            ),
+                            fundingInstrument = com.braintreepayments.api.paypalsavedpaymentmethod.styling.FundingInstrumentStyle(
+                                textFontSizeSp = fiTextSize.floatOrNull(),
+                                editIconSizeDp = editIconSize.floatOrNull(),
+                                marginStartDp = fiMarginStart.floatOrNull()
+                            ),
+                            creditMessaging = com.braintreepayments.api.paypalsavedpaymentmethod.styling.CreditMessagingStyle(
+                                fontSizeSp = creditFontSize.floatOrNull(),
+                                linkColor = linkColor.color
                             )
                         )
                     )
@@ -109,7 +140,93 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
                 dialog.dismiss()
             }
         dialog.setContentView(sheet)
+        dialog.setOnShowListener {
+            val bottomSheet = sheet.parent as? View ?: return@setOnShowListener
+            bottomSheet.layoutParams = bottomSheet.layoutParams.apply {
+                this.height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            BottomSheetBehavior.from(bottomSheet).apply {
+                state = BottomSheetBehavior.STATE_EXPANDED
+                skipCollapsed = true
+                isDraggable = false
+            }
+        }
         dialog.show()
+    }
+
+    private fun colorRow(sheet: View, previewId: Int, pickId: Int, defaultId: Int): ColorSelection {
+        val selection = ColorSelection(null)
+        val preview = sheet.findViewById<View>(previewId)
+        val defaultCheck = sheet.findViewById<CheckBox>(defaultId)
+        fun render() { preview.setBackgroundColor(selection.color ?: Color.LTGRAY) }
+        render()
+        defaultCheck.isChecked = true
+        defaultCheck.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                selection.color = null
+                render()
+            }
+        }
+        sheet.findViewById<Button>(pickId).setOnClickListener {
+            showColorPicker(selection.color) { color ->
+                selection.color = color
+                defaultCheck.isChecked = false
+                render()
+            }
+        }
+        return selection
+    }
+
+    private fun showColorPicker(initialColor: Int?, onPicked: (Int) -> Unit) {
+        val picker = layoutInflater.inflate(R.layout.dialog_color_picker, null)
+        val preview = picker.findViewById<View>(R.id.color_picker_preview)
+        val hex = picker.findViewById<EditText>(R.id.color_picker_hex)
+        val red = picker.findViewById<SeekBar>(R.id.color_picker_red)
+        val green = picker.findViewById<SeekBar>(R.id.color_picker_green)
+        val blue = picker.findViewById<SeekBar>(R.id.color_picker_blue)
+        val start = initialColor ?: Color.GRAY
+        fun currentColor() = Color.rgb(red.progress, green.progress, blue.progress)
+        fun hexOf(color: Int) = String.format("#%06X", 0xFFFFFF and color)
+        red.progress = Color.red(start)
+        green.progress = Color.green(start)
+        blue.progress = Color.blue(start)
+        hex.setText(hexOf(start))
+        preview.setBackgroundColor(start)
+        var syncing = false
+        val listener = object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser) return
+                val color = currentColor()
+                preview.setBackgroundColor(color)
+                syncing = true
+                hex.setText(hexOf(color))
+                syncing = false
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        }
+        red.setOnSeekBarChangeListener(listener)
+        green.setOnSeekBarChangeListener(listener)
+        blue.setOnSeekBarChangeListener(listener)
+        hex.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                if (syncing) return
+                runCatching { Color.parseColor(s.toString().trim()) }.getOrNull()?.let { color ->
+                    red.progress = Color.red(color)
+                    green.progress = Color.green(color)
+                    blue.progress = Color.blue(color)
+                    preview.setBackgroundColor(color)
+                }
+            }
+        })
+        AlertDialog.Builder(requireContext())
+            .setTitle("Pick a color")
+            .setView(picker)
+            .setPositiveButton(android.R.string.ok) { _, _ -> onPicked(currentColor()) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     @OptIn(ExperimentalBetaApi::class)
@@ -183,6 +300,8 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
 }
 
 private fun EditText.floatOrNull(): Float? = text.toString().trim().toFloatOrNull()
+
+private class ColorSelection(var color: Int?)
 
 private const val FLOW_CONTINUE = 0
 private const val FLOW_PAY_NOW = 1

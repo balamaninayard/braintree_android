@@ -9,12 +9,28 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Configure component style"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Configure component style"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/paypal_saved_payment_method_xml_style_close"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Close"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        </LinearLayout>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/paypal_saved_payment_method_xml_style_show_logo"
@@ -51,6 +67,33 @@
             android:hint="Border width (dp)"
             android:inputType="numberDecimal" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Border color"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <View
+                android:id="@+id/paypal_saved_payment_method_xml_style_border_color_preview"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+            <Button
+                android:id="@+id/paypal_saved_payment_method_xml_style_border_color_pick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick color" />
+            <CheckBox
+                android:id="@+id/paypal_saved_payment_method_xml_style_border_color_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Use default" />
+        </LinearLayout>
+
         <EditText
             android:id="@+id/paypal_saved_payment_method_xml_style_height"
             android:layout_width="match_parent"
@@ -71,6 +114,58 @@
             android:layout_height="wrap_content"
             android:hint="Vertical padding (dp)"
             android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Background color"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <View
+                android:id="@+id/paypal_saved_payment_method_xml_style_background_color_preview"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+            <Button
+                android:id="@+id/paypal_saved_payment_method_xml_style_background_color_pick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick color" />
+            <CheckBox
+                android:id="@+id/paypal_saved_payment_method_xml_style_background_color_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Use default" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Text color"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <View
+                android:id="@+id/paypal_saved_payment_method_xml_style_text_color_preview"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+            <Button
+                android:id="@+id/paypal_saved_payment_method_xml_style_text_color_pick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick color" />
+            <CheckBox
+                android:id="@+id/paypal_saved_payment_method_xml_style_text_color_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Use default" />
+        </LinearLayout>
 
         <EditText
             android:id="@+id/paypal_saved_payment_method_xml_style_base_font_size"
@@ -99,6 +194,60 @@
             android:layout_height="wrap_content"
             android:hint="Label margin start (dp)"
             android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_fi_text_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Funding instrument text size (sp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_edit_icon_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Edit icon size (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_fi_margin_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Funding instrument margin start (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_credit_font_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Credit messaging font size (sp)"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Credit messaging link color"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <View
+                android:id="@+id/paypal_saved_payment_method_xml_style_link_color_preview"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+            <Button
+                android:id="@+id/paypal_saved_payment_method_xml_style_link_color_pick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick color" />
+            <CheckBox
+                android:id="@+id/paypal_saved_payment_method_xml_style_link_color_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Use default" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/paypal_saved_payment_method_xml_style_apply"
