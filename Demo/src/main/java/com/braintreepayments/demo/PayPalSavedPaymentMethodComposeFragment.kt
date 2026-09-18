@@ -60,11 +60,10 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLogoStyl
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
 
 open class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
-
     private val args: PayPalSavedPaymentMethodComposeFragmentArgs by navArgs()
     private val nonceState = mutableStateOf<String?>(null)
 
-    open override fun onCreateView(
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?

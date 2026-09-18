@@ -53,7 +53,7 @@ internal object GetPayPalSavedPaymentMethodGraphQLBody {
 
     private const val STICKY_FI = "STICKY_FI"
     private const val FI_FROM_APPROVED_CHECKOUT = "FI_FROM_APPROVED_CHECKOUT"
-    private const val BT_NATIVE_SDK = "BT_JS_SDK"
+    private const val BT_NATIVE_SDK = "BT_NATIVE_SDK"
 
     private const val QUERY =
         "query PaypalFundingInstrumentDetails(\$input: PayPalFundingInstrumentDetailsInput!) { " +
