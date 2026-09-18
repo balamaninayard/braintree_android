@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configure component style"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/paypal_saved_payment_method_xml_style_show_logo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Show PayPal logo" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/paypal_saved_payment_method_xml_style_show_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Show PayPal label" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/paypal_saved_payment_method_xml_style_show_credit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Show credit messaging" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_corner_radius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Corner radius (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_border_width"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Border width (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Height (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_horizontal_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Horizontal padding (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_vertical_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Vertical padding (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_base_font_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Base font size (sp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_logo_width"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Logo width (dp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_label_font_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Label font size (sp)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/paypal_saved_payment_method_xml_style_label_margin_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Label margin start (dp)"
+            android:inputType="numberDecimal" />
+
+        <Button
+            android:id="@+id/paypal_saved_payment_method_xml_style_apply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Apply &amp; reload" />
+
+    </LinearLayout>
+</ScrollView>

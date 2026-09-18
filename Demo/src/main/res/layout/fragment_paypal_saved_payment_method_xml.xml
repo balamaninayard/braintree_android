@@ -12,23 +12,43 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="PayPal Saved Payment Method XML"
+            android:text="PayPalSavedPaymentMethodView"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Client Token"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/paypal_saved_payment_method_xml_client_token"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Client token with paymentMethodIdJwt"
+            android:hint="Paste a client token with paymentMethodIdJwt"
             android:inputType="textMultiLine"
             android:maxLines="4" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Amount"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/paypal_saved_payment_method_xml_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Amount"
             android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Flow"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/paypal_saved_payment_method_xml_flow"
@@ -43,17 +63,40 @@
             android:layout_height="wrap_content"
             android:text="Enable PayPal App Switch" />
 
-        <Button
-            android:id="@+id/paypal_saved_payment_method_xml_load"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Load component" />
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/paypal_saved_payment_method_xml_load"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Load component" />
+
+            <Button
+                android:id="@+id/paypal_saved_payment_method_xml_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="Style" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Component"
+            android:textStyle="bold" />
 
         <com.braintreepayments.api.paypalsavedpaymentmethod.component.PayPalSavedPaymentMethodView
             android:id="@+id/paypal_saved_payment_method_xml_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </ScrollView>

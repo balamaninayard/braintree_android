@@ -14,6 +14,12 @@ import com.braintreepayments.api.paypal.PayPalPendingRequest
 import com.braintreepayments.api.paypal.PayPalResult
 import com.braintreepayments.api.paypalsavedpaymentmethod.callback.PayPalSavedPaymentMethodLaunchCallback
 import com.braintreepayments.api.paypalsavedpaymentmethod.component.PayPalSavedPaymentMethodView
+import com.braintreepayments.api.paypalsavedpaymentmethod.styling.ComponentAppearance
+import com.braintreepayments.api.paypalsavedpaymentmethod.styling.ContainerStyle
+import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLabelStyle
+import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLogoStyle
+import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.core.net.toUri
 import androidx.navigation.fragment.findNavController
@@ -46,6 +52,8 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
 
         view.findViewById<Button>(R.id.paypal_saved_payment_method_xml_load)
             .setOnClickListener { reload() }
+        view.findViewById<Button>(R.id.paypal_saved_payment_method_xml_style)
+            .setOnClickListener { showStyleBottomSheet() }
 
         if (args.clientToken.isBlank()) {
             savedPaymentMethodView.visibility = View.GONE
@@ -53,6 +61,55 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
             initializeComponent()
         }
         return view
+    }
+
+    private fun showStyleBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext())
+        val sheet = layoutInflater.inflate(
+            R.layout.bottom_sheet_paypal_saved_payment_method_xml_style,
+            null
+        )
+        val showLogo = sheet.findViewById<SwitchMaterial>(R.id.paypal_saved_payment_method_xml_style_show_logo)
+        val showLabel = sheet.findViewById<SwitchMaterial>(R.id.paypal_saved_payment_method_xml_style_show_label)
+        val showCredit = sheet.findViewById<SwitchMaterial>(R.id.paypal_saved_payment_method_xml_style_show_credit)
+        val cornerRadius = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_corner_radius)
+        val borderWidth = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_border_width)
+        val height = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_height)
+        val horizontalPadding = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_horizontal_padding)
+        val verticalPadding = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_vertical_padding)
+        val baseFontSize = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_base_font_size)
+        val logoWidth = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_logo_width)
+        val labelFontSize = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_label_font_size)
+        val labelMarginStart = sheet.findViewById<EditText>(R.id.paypal_saved_payment_method_xml_style_label_margin_start)
+
+        sheet.findViewById<Button>(R.id.paypal_saved_payment_method_xml_style_apply)
+            .setOnClickListener {
+                savedPaymentMethodView.setStyle(
+                    PayPalSavedPaymentMethodViewStyle(
+                        showPayPalLogo = showLogo.isChecked,
+                        showPayPalLabel = showLabel.isChecked,
+                        showPayPalCreditMessaging = showCredit.isChecked,
+                        componentAppearance = ComponentAppearance(
+                            baseFontSizeSp = baseFontSize.floatOrNull()
+                        ),
+                        container = ContainerStyle(
+                            heightDp = height.floatOrNull(),
+                            horizontalPaddingDp = horizontalPadding.floatOrNull(),
+                            verticalPaddingDp = verticalPadding.floatOrNull(),
+                            cornerRadiusDp = cornerRadius.floatOrNull(),
+                            borderWidthDp = borderWidth.floatOrNull(),
+                            logo = PayPalLogoStyle(widthDp = logoWidth.floatOrNull()),
+                            label = PayPalLabelStyle(
+                                fontSizeSp = labelFontSize.floatOrNull(),
+                                marginStartDp = labelMarginStart.floatOrNull()
+                            )
+                        )
+                    )
+                )
+                dialog.dismiss()
+            }
+        dialog.setContentView(sheet)
+        dialog.show()
     }
 
     @OptIn(ExperimentalBetaApi::class)
@@ -124,6 +181,8 @@ class PayPalSavedPaymentMethodXmlFragment : BaseFragment() {
         }
     }
 }
+
+private fun EditText.floatOrNull(): Float? = text.toString().trim().toFloatOrNull()
 
 private const val FLOW_CONTINUE = 0
 private const val FLOW_PAY_NOW = 1
