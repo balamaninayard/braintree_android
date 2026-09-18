@@ -21,6 +21,10 @@
     <string name="paypal_messaging_button">PayPal Messaging</string>
     <string name="paypal_saved_payment_method_xml_button">PayPal Saved Payment Method XML</string>
     <string name="paypal_saved_payment_method_compose_button">PayPal Saved Payment Method Compose</string>
+    <string-array name="paypal_saved_payment_method_flow_options">
+        <item>Continue</item>
+        <item>Pay Now</item>
+    </string-array>
     <string name="shopper_insights_button">Payment Ready V1</string>
     <string name="shopper_insights_v2_button">Payment Ready V2</string>
     <string name="create_transaction">Create a Transaction</string>
