@@ -61,6 +61,9 @@ class MainFragment : BaseFragment() {
                                 PaymentModuleButton(R.string.paypal_saved_payment_method_button) {
                                     launchPayPalSavedPaymentMethod()
                                 }
+                                PaymentModuleButton(R.string.paypal_saved_payment_method_compose_button) {
+                                    launchPayPalSavedPaymentMethodCompose()
+                                }
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
 
@@ -232,6 +235,14 @@ class MainFragment : BaseFragment() {
     private fun launchPayPalSavedPaymentMethod() {
         fetchAuthorizationAndHandleError { authString ->
             val action = MainFragmentDirections.actionMainFragmentToPayPalSavedPaymentMethodFragment()
+            action.setAuthString(authString)
+            findNavController().navigate(action)
+        }
+    }
+
+    private fun launchPayPalSavedPaymentMethodCompose() {
+        fetchAuthorizationAndHandleError { authString ->
+            val action = MainFragmentDirections.actionMainFragmentToPayPalSavedPaymentMethodComposeFragment()
             action.setAuthString(authString)
             findNavController().navigate(action)
         }
