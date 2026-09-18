@@ -44,9 +44,6 @@
             android:id="@+id/action_mainFragment_to_uiComponentsFragment"
             app:destination="@id/uiComponentsFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_payPalSavedPaymentMethodFragment"
-            app:destination="@id/payPalSavedPaymentMethodFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_payPalSavedPaymentMethodComposeFragment"
             app:destination="@id/payPalSavedPaymentMethodComposeFragment" />
     </fragment>
@@ -256,40 +253,6 @@
             app:popUpTo="@id/mainFragment"
             app:popUpToInclusive="false" />
     </fragment>
-    <fragment
-        android:id="@+id/payPalSavedPaymentMethodFragment"
-        android:name="com.braintreepayments.demo.PayPalSavedPaymentMethodFragment"
-        tools:layout="@layout/fragment_paypal_saved_payment_method">
-        <argument
-            android:name="authString"
-            android:defaultValue=""
-            app:argType="string" />
-        <argument
-            android:name="clientToken"
-            android:defaultValue=""
-            app:argType="string" />
-        <argument
-            android:name="amount"
-            android:defaultValue=""
-            app:argType="string" />
-        <argument
-            android:name="payNow"
-            android:defaultValue="false"
-            app:argType="boolean" />
-        <argument
-            android:name="enableAppSwitch"
-            android:defaultValue="false"
-            app:argType="boolean" />
-        <!-- "Load component" re-navigates here rather than calling initialize() again: that
-             registers an activity result launcher, which must happen before the fragment is
-             STARTED. A fresh fragment registers cleanly in onCreateView. -->
-        <action
-            android:id="@+id/action_payPalSavedPaymentMethodFragment_self"
-            app:destination="@id/payPalSavedPaymentMethodFragment"
-            app:popUpTo="@id/payPalSavedPaymentMethodFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-
     <fragment
         android:id="@+id/payPalSavedPaymentMethodComposeFragment"
         android:name="com.braintreepayments.demo.PayPalSavedPaymentMethodComposeFragment">

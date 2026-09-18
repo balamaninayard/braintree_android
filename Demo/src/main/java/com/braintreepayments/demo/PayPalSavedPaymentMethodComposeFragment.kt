@@ -41,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.os.bundleOf
 import androidx.core.net.toUri
 import androidx.navigation.fragment.findNavController
@@ -49,10 +48,9 @@ import androidx.navigation.fragment.navArgs
 import com.braintreepayments.api.core.ExperimentalBetaApi
 import com.braintreepayments.api.paypal.PayPalCheckoutRequest
 import com.braintreepayments.api.paypal.PayPalPaymentUserAction
-import com.braintreepayments.api.paypal.PayPalPendingRequest
 import com.braintreepayments.api.paypal.PayPalResult
-import com.braintreepayments.api.paypalsavedpaymentmethod.callback.PayPalSavedPaymentMethodLaunchCallback
-import com.braintreepayments.api.paypalsavedpaymentmethod.component.PayPalSavedPaymentMethodView
+import com.braintreepayments.api.paypal.PayPalTokenizeCallback
+import com.braintreepayments.api.paypalsavedpaymentmethod.compose.PayPalSavedPaymentMethodView
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.ComponentAppearance
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.ContainerStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.CreditMessagingStyle
@@ -64,7 +62,6 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPay
 class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
 
     private val args: PayPalSavedPaymentMethodComposeFragmentArgs by navArgs()
-    private var savedPaymentMethodView: PayPalSavedPaymentMethodView? = null
     private val nonceState = mutableStateOf<String?>(null)
 
     override fun onCreateView(
@@ -72,19 +69,6 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = PayPalSavedPaymentMethodView(requireContext())
-        savedPaymentMethodView = view
-        if (args.clientToken.isNotBlank()) {
-            initializeView(
-                view = view,
-                clientToken = args.clientToken,
-                amount = args.amount,
-                payNow = args.payNow,
-                enableAppSwitch = args.enableAppSwitch,
-                style = PayPalSavedPaymentMethodViewStyle()
-            )
-        }
-
         return ComposeView(requireContext()).apply {
             setContent {
                 PayPalSavedPaymentMethodComposeScreen()
@@ -92,16 +76,7 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val pendingRequest = PendingRequestStore.getInstance().getPayPalPendingRequest(requireContext())
-            ?: return
-        savedPaymentMethodView?.handleReturnToApp(pendingRequest, requireActivity().intent)
-        PendingRequestStore.getInstance().clearPayPalPendingRequest(requireContext())
-        requireActivity().intent.data = null
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalBetaApi::class)
     @Composable
     private fun PayPalSavedPaymentMethodComposeScreen() {
         var clientToken by rememberSaveable(args.clientToken) { mutableStateOf(args.clientToken) }
@@ -302,14 +277,20 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
                 }
             }
 
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { savedPaymentMethodView ?: PayPalSavedPaymentMethodView(it) },
-                update = { view ->
-                    savedPaymentMethodView = view
-                    view.visibility = if (args.clientToken.isBlank()) View.GONE else View.VISIBLE
-                }
-            )
+            if (args.clientToken.isNotBlank()) {
+                PayPalSavedPaymentMethodView(
+                    payPalCheckoutRequest = buildPayPalRequest(
+                        amount = args.amount,
+                        payNow = args.payNow,
+                        enableAppSwitch = args.enableAppSwitch
+                    ),
+                    authorization = args.clientToken,
+                    appLinkReturnUrl = APP_LINK_RETURN_URL.toUri(),
+                    deepLinkFallbackUrlScheme = DEEP_LINK_FALLBACK_URL_SCHEME,
+                    style = style,
+                    paypalTokenizeCallback = paypalTokenizeCallback
+                )
+            }
 
             nonce?.let { nonceValue ->
                 Column(
@@ -383,7 +364,6 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
 
                     Button(
                         onClick = {
-                            savedPaymentMethodView?.setStyle(style)
                             showStyleSheet = false
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -547,26 +527,6 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
     private fun hexOf(color: Int): String = String.format("#%06X", 0xFFFFFF and color)
 
     @OptIn(ExperimentalBetaApi::class)
-    private fun initializeView(
-        view: PayPalSavedPaymentMethodView,
-        clientToken: String,
-        amount: String,
-        payNow: Boolean,
-        enableAppSwitch: Boolean,
-        style: PayPalSavedPaymentMethodViewStyle,
-    ) {
-        view.setStyle(style)
-        view.initialize(
-            activityResultCaller = this,
-            authorization = clientToken.ifBlank { authStringArg },
-            appLinkReturnUrl = APP_LINK_RETURN_URL.toUri(),
-            payPalRequest = buildPayPalRequest(amount, payNow, enableAppSwitch),
-            callback = launchCallback,
-            deepLinkFallbackUrlScheme = DEEP_LINK_FALLBACK_URL_SCHEME
-        )
-    }
-
-    @OptIn(ExperimentalBetaApi::class)
     private fun buildPayPalRequest(
         amount: String,
         payNow: Boolean,
@@ -593,24 +553,14 @@ class PayPalSavedPaymentMethodComposeFragment : BaseFragment() {
             }
         }
 
-    private val launchCallback = object : PayPalSavedPaymentMethodLaunchCallback {
-        override fun onSavedPaymentMethodLaunch(payPalPendingRequest: PayPalPendingRequest) {
-            when (payPalPendingRequest) {
-                is PayPalPendingRequest.Started -> PendingRequestStore.getInstance()
-                    .putPayPalPendingRequest(requireContext(), payPalPendingRequest)
-                is PayPalPendingRequest.Failure -> handleError(payPalPendingRequest.error)
+    private val paypalTokenizeCallback = PayPalTokenizeCallback { result ->
+        when (result) {
+            is PayPalResult.Success -> {
+                onPaymentMethodNonceCreated(result.nonce)
+                nonceState.value = result.nonce.string
             }
-        }
-
-        override fun onSavedPaymentMethodResult(result: PayPalResult) {
-            when (result) {
-                is PayPalResult.Success -> {
-                    onPaymentMethodNonceCreated(result.nonce)
-                    nonceState.value = result.nonce.string
-                }
-                is PayPalResult.Cancel -> handleError(Exception("User did not complete payment flow"))
-                is PayPalResult.Failure -> handleError(result.error)
-            }
+            is PayPalResult.Cancel -> handleError(Exception("User did not complete payment flow"))
+            is PayPalResult.Failure -> handleError(result.error)
         }
     }
 
