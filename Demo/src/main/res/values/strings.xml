@@ -19,8 +19,7 @@
     <string name="sepa_direct_debit_button">SEPA Direct Debit</string>
     <string name="cards">Credit or Debit Cards</string>
     <string name="paypal_messaging_button">PayPal Messaging</string>
-    <string name="paypal_saved_payment_method_button">PayPal Saved Payment Method</string>
-    <string name="shopper_insights_button">Payment Ready V1</string>
+    <string name="paypal_saved_payment_method_button">PayPal Saved Payment Method XML</string>    <string name="shopper_insights_button">Payment Ready V1</string>
     <string name="shopper_insights_v2_button">Payment Ready V2</string>
     <string name="create_transaction">Create a Transaction</string>
     <string name="loading">Loading…</string>
@@ -149,12 +148,14 @@
     <string name="paypal_saved_payment_method_flow_continue">Continue</string>
     <string name="paypal_saved_payment_method_flow_pay_now">Pay Now</string>
     <string name="paypal_saved_payment_method_load_button">Load component</string>
+    <string name="paypal_saved_payment_method_app_switch_label">Enable PayPal App Switch</string>
     <string name="paypal_saved_payment_method_component_label">PayPalSavedPaymentMethodView</string>
     <string name="paypal_saved_payment_method_nonce_clear_button">Clear</string>
     <string name="paypal_saved_payment_method_nonce_placeholder">Nonce updated: %s</string>
     <string name="paypal_saved_payment_method_missing_token">Enter a client token containing an unexpired paymentMethodIdJwt. Without it the funding instrument fetch fails and only the PayPal brand mark renders.</string>
     <string name="paypal_saved_payment_method_style_button">Style</string>
     <string name="paypal_saved_payment_method_style_title">Configure component style</string>
+    <string name="paypal_saved_payment_method_style_close">Close</string>
     <string name="paypal_saved_payment_method_style_show_logo">Show PayPal logo</string>
     <string name="paypal_saved_payment_method_style_show_label">Show PayPal label</string>
     <string name="paypal_saved_payment_method_style_show_credit_messaging">Show credit messaging</string>

@@ -60,6 +60,14 @@
             android:entries="@array/paypal_saved_payment_method_flow_options"
             android:spinnerMode="dropdown" />
 
+        <!-- ===== App switch: maps to PayPalCheckoutRequest.enablePayPalAppSwitch ===== -->
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/paypal_saved_payment_method_app_switch_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/paypal_saved_payment_method_app_switch_label" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,14 +76,16 @@
 
             <Button
                 android:id="@+id/paypal_saved_payment_method_load_button"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/paypal_saved_payment_method_load_button" />
 
             <Button
                 android:id="@+id/paypal_saved_payment_method_style_button"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginStart="12dp"
                 android:text="@string/paypal_saved_payment_method_style_button" />
         </LinearLayout>

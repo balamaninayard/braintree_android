@@ -273,6 +273,10 @@
             android:name="payNow"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="enableAppSwitch"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <!-- "Load component" re-navigates here rather than calling initialize() again: that
              registers an activity result launcher, which must happen before the fragment is
              STARTED. A fresh fragment registers cleanly in onCreateView. -->

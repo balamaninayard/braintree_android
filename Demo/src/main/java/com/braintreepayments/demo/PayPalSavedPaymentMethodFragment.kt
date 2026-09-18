@@ -31,6 +31,7 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.styling.FundingInstrum
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLabelStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLogoStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -53,6 +54,7 @@ class PayPalSavedPaymentMethodFragment : BaseFragment() {
     private lateinit var clientTokenInput: EditText
     private lateinit var amountInput: EditText
     private lateinit var flowSpinner: Spinner
+    private lateinit var appSwitchToggle: SwitchMaterial
     private lateinit var savedPaymentMethodView: PayPalSavedPaymentMethodView
     private lateinit var nonceSection: View
     private lateinit var nonceText: TextView
@@ -70,6 +72,8 @@ class PayPalSavedPaymentMethodFragment : BaseFragment() {
             .apply { setText(args.amount) }
         flowSpinner = view.findViewById<Spinner>(R.id.paypal_saved_payment_method_flow_spinner)
             .apply { setSelection(if (args.payNow) FLOW_PAY_NOW_POSITION else FLOW_CONTINUE_POSITION) }
+        appSwitchToggle = view.findViewById<SwitchMaterial>(R.id.paypal_saved_payment_method_app_switch_toggle)
+            .apply { isChecked = args.enableAppSwitch }
         savedPaymentMethodView = view.findViewById(R.id.paypal_saved_payment_method_view)
         nonceSection = view.findViewById(R.id.paypal_saved_payment_method_nonce_section)
         nonceText = view.findViewById(R.id.paypal_saved_payment_method_nonce_text)
@@ -235,7 +239,25 @@ class PayPalSavedPaymentMethodFragment : BaseFragment() {
                 reload()
             }
 
+        sheet.findViewById<View>(R.id.paypal_saved_payment_method_style_close_button)
+            .setOnClickListener { dialog.dismiss() }
+
         dialog.setContentView(sheet)
+        // Open full screen and lock it there: dragging is disabled so a downward scroll inside the
+        // content is never intercepted as a dismiss gesture. The content view's parent is the bottom
+        // sheet container, so we resize that rather than looking up a library-internal id.
+        dialog.setOnShowListener {
+            val bottomSheet = sheet.parent as? View ?: return@setOnShowListener
+            bottomSheet.layoutParams = bottomSheet.layoutParams.apply {
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            BottomSheetBehavior.from(bottomSheet).apply {
+                state = BottomSheetBehavior.STATE_EXPANDED
+                skipCollapsed = true
+                isHideable = false
+                isDraggable = false
+            }
+        }
         dialog.show()
     }
 
@@ -348,6 +370,7 @@ class PayPalSavedPaymentMethodFragment : BaseFragment() {
             /* isAmountBreakdownEnabled = */ false
         ).apply {
             currencyCode = CURRENCY_CODE
+            enablePayPalAppSwitch = args.enableAppSwitch
             // "Continue" shows a final confirmation back here; "Pay Now" commits on the PayPal page.
             userAction = if (args.payNow) {
                 PayPalPaymentUserAction.USER_ACTION_COMMIT
@@ -377,6 +400,7 @@ class PayPalSavedPaymentMethodFragment : BaseFragment() {
         action.clientToken = enteredClientToken
         action.amount = amountInput.text.toString().trim()
         action.payNow = flowSpinner.selectedItemPosition == FLOW_PAY_NOW_POSITION
+        action.enableAppSwitch = appSwitchToggle.isChecked
         findNavController().navigate(action)
     }
 
