@@ -36,6 +36,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_show_logo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:checked="true"
             android:text="Show PayPal logo" />
 
@@ -43,6 +44,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_show_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:checked="true"
             android:text="Show PayPal label" />
 
@@ -50,6 +52,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_show_credit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:checked="true"
             android:text="Show credit messaging" />
 
@@ -57,6 +60,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_corner_radius"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Corner radius (dp)"
             android:inputType="numberDecimal" />
 
@@ -64,18 +68,21 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_border_width"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Border width (dp)"
             android:inputType="numberDecimal" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="Border color"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
             <View
@@ -98,6 +105,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_height"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Height (dp)"
             android:inputType="numberDecimal" />
 
@@ -105,6 +113,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_horizontal_padding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Horizontal padding (dp)"
             android:inputType="numberDecimal" />
 
@@ -112,17 +121,20 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_vertical_padding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Vertical padding (dp)"
             android:inputType="numberDecimal" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="Background color"
             android:textStyle="bold" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
             <View
@@ -144,11 +156,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="Text color"
             android:textStyle="bold" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
             <View
@@ -171,6 +185,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_base_font_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Base font size (sp)"
             android:inputType="numberDecimal" />
 
@@ -178,6 +193,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_logo_width"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Logo width (dp)"
             android:inputType="numberDecimal" />
 
@@ -185,6 +201,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_label_font_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Label font size (sp)"
             android:inputType="numberDecimal" />
 
@@ -192,6 +209,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_label_margin_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Label margin start (dp)"
             android:inputType="numberDecimal" />
 
@@ -199,6 +217,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_fi_text_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Funding instrument text size (sp)"
             android:inputType="numberDecimal" />
 
@@ -206,6 +225,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_edit_icon_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Edit icon size (dp)"
             android:inputType="numberDecimal" />
 
@@ -213,6 +233,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_fi_margin_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Funding instrument margin start (dp)"
             android:inputType="numberDecimal" />
 
@@ -220,17 +241,20 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_credit_font_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Credit messaging font size (sp)"
             android:inputType="numberDecimal" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="Credit messaging link color"
             android:textStyle="bold" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
             <View
@@ -253,7 +277,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_style_apply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="Apply &amp; reload" />
 
     </LinearLayout>

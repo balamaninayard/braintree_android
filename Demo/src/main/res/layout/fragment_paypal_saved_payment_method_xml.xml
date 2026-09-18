@@ -61,6 +61,7 @@
             android:id="@+id/paypal_saved_payment_method_xml_app_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="Enable PayPal App Switch" />
 
         <LinearLayout
