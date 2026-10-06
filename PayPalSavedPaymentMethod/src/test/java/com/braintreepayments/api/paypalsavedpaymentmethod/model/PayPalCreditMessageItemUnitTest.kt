@@ -50,10 +50,18 @@ class PayPalCreditMessageItemUnitTest {
     }
 
     @Test
-    fun `fromJson sets type to null for an unrecognized type`() {
-        val item = PayPalCreditMessageItem.fromJson(JSONObject().put("type", "TEXT_VARIABLE"))
+    fun `fromJson returns a null isEmbeddable when the field is null`() {
+        val item = PayPalCreditMessageItem.fromJson(JSONObject().put("embeddable", JSONObject.NULL))
+
+        assertNull(item?.isEmbeddable)
+    }
+
+    @Test
+    fun `fromJson sets type to null for an unrecognized type and keeps the rest of the block`() {
+        val item = PayPalCreditMessageItem.fromJson(JSONObject().put("type", "TEXT_VARIABLE").put("text", "Pay in 4"))
 
         assertNull(item?.type)
+        assertEquals("Pay in 4", item?.text)
     }
 
     @Test

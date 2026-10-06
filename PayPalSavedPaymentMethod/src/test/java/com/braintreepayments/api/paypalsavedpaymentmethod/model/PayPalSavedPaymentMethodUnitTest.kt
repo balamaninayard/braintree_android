@@ -13,26 +13,27 @@ class PayPalSavedPaymentMethodUnitTest {
     @Test
     fun `fromJson parses all fields`() {
         val json = JSONObject()
-            .put("label", "CREDIT UNION 1")
-            .put("imageUrl", "https://example.com/bank.png")
+            .put("label", "PayPal Credit")
+            .put("imageUrl", "https://example.com/paypal-credit.png")
             .put("lastDigits", "3357")
-            .put("type", "BANK")
+            .put("type", "PAYPAL_CREDIT")
             .put("subtype", "PAY_LATER_US")
 
         val result = PayPalSavedPaymentMethod.fromJson(json)
 
-        assertEquals("CREDIT UNION 1", result?.label)
-        assertEquals("https://example.com/bank.png", result?.imageUrl)
+        assertEquals("PayPal Credit", result?.label)
+        assertEquals("https://example.com/paypal-credit.png", result?.imageUrl)
         assertEquals("3357", result?.lastDigits)
-        assertEquals(PayPalSavedPaymentMethodType.BANK, result?.type)
+        assertEquals(PayPalSavedPaymentMethodType.PAYPAL_CREDIT, result?.type)
         assertEquals("PAY_LATER_US", result?.subtype)
     }
 
     @Test
-    fun `fromJson sets type to null for an unrecognized type`() {
-        val result = PayPalSavedPaymentMethod.fromJson(JSONObject().put("type", "SOMETHING_NEW"))
+    fun `fromJson sets type to null for an unrecognized type and keeps the rest of the instrument`() {
+        val result = PayPalSavedPaymentMethod.fromJson(JSONObject().put("type", "SOMETHING_NEW").put("label", "Visa"))
 
         assertNull(result?.type)
+        assertEquals("Visa", result?.label)
     }
 
     @Test

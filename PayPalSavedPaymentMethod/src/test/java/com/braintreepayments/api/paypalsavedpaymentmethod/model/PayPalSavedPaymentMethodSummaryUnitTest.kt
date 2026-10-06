@@ -3,7 +3,6 @@ package com.braintreepayments.api.paypalsavedpaymentmethod.model
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -45,7 +44,7 @@ class PayPalSavedPaymentMethodSummaryUnitTest {
 
         val summary = PayPalSavedPaymentMethodSummary.fromJson(json)
 
-        assertTrue(summary?.paymentMethods?.isEmpty() == true)
+        assertEquals(emptyList<PayPalSavedPaymentMethod>(), summary?.paymentMethods)
         assertEquals("buyer@example.com", summary?.payer?.email)
         assertEquals(false, summary?.payer?.isEditable)
     }
@@ -54,7 +53,7 @@ class PayPalSavedPaymentMethodSummaryUnitTest {
     fun `fromJson returns an empty summary when there is nothing to display`() {
         val summary = PayPalSavedPaymentMethodSummary.fromJson(JSONObject())
 
-        assertTrue(summary?.paymentMethods?.isEmpty() == true)
+        assertEquals(emptyList<PayPalSavedPaymentMethod>(), summary?.paymentMethods)
         assertNull(summary?.payer)
     }
 

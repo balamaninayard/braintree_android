@@ -64,6 +64,13 @@ class PayPalCreditMessagingResultUnitTest {
     }
 
     @Test
+    fun `fromJson returns null when preferred_message has no content`() {
+        val json = JSONObject("""{ "messages": [ { "preferred_message": { "id": "message-1" } } ] }""")
+
+        assertNull(PayPalCreditMessagingResult.fromJson(json))
+    }
+
+    @Test
     fun `fromJson returns null when there is no preferred_message`() {
         assertNull(PayPalCreditMessagingResult.fromJson(JSONObject("""{ "messages": [] }""")))
     }
