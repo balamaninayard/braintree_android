@@ -4,15 +4,17 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * The POST body for `v2/credit/fetch-presentment-messages`. View/Edit FI always requests Treatment A, so the flow
- * context and content attributes are fixed.
+ * The POST body for `v2/credit/fetch-presentment-messages`. The flow context and content attributes are fixed.
+ *
+ * @property amount The order amount the message is calculated from, for example `"55.00"`.
+ * @property currencyCode The ISO-4217 currency code for [amount], for example `"USD"`.
  */
 internal data class PayPalCreditMessagingRequest(
     val amount: String,
     val currencyCode: String
 ) {
 
-    fun build(): JSONObject = JSONObject()
+    fun toJson(): JSONObject = JSONObject()
         .put(FLOW_CONTEXT_KEY, FlowContext().toJson())
         .put(
             MESSAGE_PLACEMENTS_KEY,

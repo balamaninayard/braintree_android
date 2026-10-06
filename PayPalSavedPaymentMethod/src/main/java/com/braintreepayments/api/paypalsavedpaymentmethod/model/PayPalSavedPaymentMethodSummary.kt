@@ -5,7 +5,7 @@ import org.json.JSONObject
 /**
  * The funding instrument details for a vaulted PayPal payment method.
  *
- * @property paymentMethods The funding instruments PayPal can charge. The first entry is the one that will be charged.
+ * @property paymentMethods The funding instruments returned for the buyer's PayPal account.
  * @property payer The buyer's PayPal account, when PayPal returns one.
  */
 internal data class PayPalSavedPaymentMethodSummary(

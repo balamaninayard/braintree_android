@@ -8,10 +8,10 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class PayPalCreditMessagingRequestUnitTest {
 
-    private val body = PayPalCreditMessagingRequest(amount = "55.00", currencyCode = "USD").build()
+    private val body = PayPalCreditMessagingRequest(amount = "55.00", currencyCode = "USD").toJson()
 
     @Test
-    fun `build sends the amount and currencyCode under message_placements`() {
+    fun `toJson sends the amount and currencyCode under message_placements`() {
         val amount = body.getJSONArray("message_placements").getJSONObject(0).getJSONObject("amount")
 
         assertEquals("55.00", amount.getString("value"))
@@ -19,7 +19,7 @@ class PayPalCreditMessagingRequestUnitTest {
     }
 
     @Test
-    fun `build always requests Treatment A via fixed content_attributes`() {
+    fun `toJson sends the fixed content_attributes`() {
         val contentAttributes = body.getJSONArray("message_placements")
             .getJSONObject(0)
             .getJSONArray("content_attributes")
@@ -30,7 +30,7 @@ class PayPalCreditMessagingRequestUnitTest {
     }
 
     @Test
-    fun `build sends the fixed BT native flow_context`() {
+    fun `toJson sends the fixed BT native flow_context`() {
         val flowContext = body.getJSONObject("flow_context")
         val attributes = flowContext.getJSONArray("attributes")
 

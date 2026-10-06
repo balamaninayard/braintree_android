@@ -6,12 +6,12 @@ package com.braintreepayments.api.paypalsavedpaymentmethod.model
 internal enum class PayPalCreditMessageItemType(val rawValue: String) {
 
     /**
-     * A logo image, with `alternativeText` as its alt text.
+     * A logo image, with [PayPalCreditMessageItem.alternativeText] as its alt text.
      */
     IMAGE("IMAGE"),
 
     /**
-     * Tappable copy that opens `clickUrl`, such as "Learn more".
+     * Tappable copy that opens [PayPalCreditMessageItem.clickUrl], such as "Learn more".
      */
     LINK("LINK"),
 

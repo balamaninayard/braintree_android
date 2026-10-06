@@ -50,7 +50,7 @@ internal data class PayPalCreditMessagingResult(
 
             // Reporting success with no copy would fire the impression beacon for a message the buyer never saw.
             // Image blocks carry their copy in alternativeText rather than text.
-            if (mainItems.none { !it.text.isNullOrEmpty() || !it.alternativeText.isNullOrEmpty() }) return null
+            if (mainItems.all { it.text.isNullOrEmpty() && it.alternativeText.isNullOrEmpty() }) return null
 
             return PayPalCreditMessagingResult(
                 mainItems = mainItems,

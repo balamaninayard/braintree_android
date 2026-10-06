@@ -11,7 +11,8 @@ import org.json.JSONObject
  * @property label The display name of the funding instrument, for example `"Visa"` or `"CREDIT UNION 1"`.
  * @property imageUrl The card art or bank glyph to render alongside the label.
  * @property lastDigits The last digits of the funding instrument's account number.
- * @property subtype A further qualifier on [type], for example the card's product name.
+ * @property subtype A further qualifier on [type], returned for [PayPalSavedPaymentMethodType.PAYPAL_CREDIT]
+ * instruments.
  */
 internal data class PayPalSavedPaymentMethod(
     val type: PayPalSavedPaymentMethodType?,
