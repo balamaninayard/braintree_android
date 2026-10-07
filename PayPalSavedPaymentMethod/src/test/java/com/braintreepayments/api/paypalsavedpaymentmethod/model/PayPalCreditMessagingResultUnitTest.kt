@@ -75,6 +75,13 @@ class PayPalCreditMessagingResultUnitTest {
         assertNull(PayPalCreditMessagingResult.fromJson(JSONObject("""{ "messages": [] }""")))
     }
 
+    @Test
+    fun `fromJson returns a null impressionUrl when analytics is absent`() {
+        val json = messageWithMainItems("""[ { "type": "TEXT", "text": "Pay in 4" } ]""")
+
+        assertNull(PayPalCreditMessagingResult.fromJson(json)?.impressionUrl)
+    }
+
     private fun messageWithMainItems(mainItems: String) = JSONObject(
         """{ "messages": [ { "preferred_message": { "content": { "main_items": $mainItems } } } ] }"""
     )
