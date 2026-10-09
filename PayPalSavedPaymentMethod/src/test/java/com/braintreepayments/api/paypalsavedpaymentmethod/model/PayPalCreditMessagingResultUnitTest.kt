@@ -34,14 +34,14 @@ class PayPalCreditMessagingResultUnitTest {
             """.trimIndent()
         )
 
-        val result = PayPalCreditMessagingResult.fromJson(json)
+        val result = requireNotNull(PayPalCreditMessagingResult.fromJson(json))
 
-        assertEquals("Pay in 4", result?.mainItems?.single()?.text)
-        assertEquals("See terms", result?.disclaimerItems?.single()?.text)
-        assertEquals("Learn more", result?.actionItems?.single()?.text)
-        assertEquals("message-1", result?.messageId)
-        assertEquals("PLST_SQ", result?.messageType)
-        assertEquals("https://paypal.com/impression", result?.impressionUrl)
+        assertEquals("Pay in 4", result.mainItems.single().text)
+        assertEquals("See terms", result.disclaimerItems.single().text)
+        assertEquals("Learn more", result.actionItems.single().text)
+        assertEquals("message-1", result.messageId)
+        assertEquals("PLST_SQ", result.messageType)
+        assertEquals("https://paypal.com/impression", result.impressionUrl)
     }
 
     @Test
@@ -60,7 +60,7 @@ class PayPalCreditMessagingResultUnitTest {
     fun `fromJson drops malformed entries from content item arrays`() {
         val json = messageWithMainItems("""[ "not-an-object", { "type": "TEXT", "text": "Pay in 4" } ]""")
 
-        assertEquals(1, PayPalCreditMessagingResult.fromJson(json)?.mainItems?.size)
+        assertEquals(1, requireNotNull(PayPalCreditMessagingResult.fromJson(json)).mainItems.size)
     }
 
     @Test
@@ -79,7 +79,29 @@ class PayPalCreditMessagingResultUnitTest {
     fun `fromJson returns a null impressionUrl when analytics is absent`() {
         val json = messageWithMainItems("""[ { "type": "TEXT", "text": "Pay in 4" } ]""")
 
-        assertNull(PayPalCreditMessagingResult.fromJson(json)?.impressionUrl)
+        assertNull(requireNotNull(PayPalCreditMessagingResult.fromJson(json)).impressionUrl)
+    }
+
+    @Test
+    fun `fromJson returns a null impressionUrl for a javascript url`() {
+        val json = JSONObject(
+            """
+            {
+              "messages": [
+                {
+                  "preferred_message": {
+                    "content": { "main_items": [ { "type": "TEXT", "text": "Pay in 4" } ] },
+                    "analytics": { "impression_url": "javascript:alert(1)" }
+                  }
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+
+        val result = requireNotNull(PayPalCreditMessagingResult.fromJson(json))
+
+        assertNull(result.impressionUrl)
     }
 
     private fun messageWithMainItems(mainItems: String) = JSONObject(

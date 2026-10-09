@@ -5,8 +5,9 @@ import org.json.JSONObject
 /**
  * The funding instrument details for a vaulted PayPal payment method.
  *
- * @property paymentMethods The funding instruments returned for the buyer's PayPal account.
- * @property payer The buyer's PayPal account, when PayPal returns one.
+ * @property paymentMethods The funding instruments returned for the buyer's PayPal account. Entries without a type or
+ * label are dropped, so an empty list means there is no instrument to display.
+ * @property payer The buyer's PayPal account, when PayPal returns one with an email.
  */
 internal data class PayPalSavedPaymentMethodSummary(
     val paymentMethods: List<PayPalSavedPaymentMethod>,

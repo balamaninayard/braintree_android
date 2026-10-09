@@ -1,5 +1,6 @@
 package com.braintreepayments.api.paypalsavedpaymentmethod.model
 
+import com.braintreepayments.api.paypalsavedpaymentmethod.asHttpsUrlOrNull
 import com.braintreepayments.api.sharedutils.Json
 import org.json.JSONArray
 import org.json.JSONObject
@@ -12,7 +13,8 @@ import org.json.JSONObject
  * @property actionItems The interactive blocks of the message, such as the "Learn more" link.
  * @property messageId The identifier of the message that was selected.
  * @property messageType The template the message was built from, for example `"PLST_SQ"`.
- * @property impressionUrl The tracking beacon to fire once the message is on screen.
+ * @property impressionUrl The tracking beacon to fire once the message is on screen. `null` unless PayPal returns an
+ * https URL.
  */
 internal data class PayPalCreditMessagingResult(
     val mainItems: List<PayPalCreditMessageItem>,
@@ -59,6 +61,7 @@ internal data class PayPalCreditMessagingResult(
                 messageId = Json.optString(preferredMessage, ID_KEY, null),
                 messageType = Json.optString(preferredMessage, TYPE_KEY, null),
                 impressionUrl = Json.optString(preferredMessage.optJSONObject(ANALYTICS_KEY), IMPRESSION_URL_KEY, null)
+                    .asHttpsUrlOrNull()
             )
         }
 

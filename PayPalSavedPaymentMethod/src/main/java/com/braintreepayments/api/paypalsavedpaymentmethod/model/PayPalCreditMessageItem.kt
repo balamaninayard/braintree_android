@@ -1,5 +1,6 @@
 package com.braintreepayments.api.paypalsavedpaymentmethod.model
 
+import com.braintreepayments.api.paypalsavedpaymentmethod.asHttpsUrlOrNull
 import com.braintreepayments.api.sharedutils.Json
 import org.json.JSONObject
 
@@ -9,8 +10,8 @@ import org.json.JSONObject
  * @property type The kind of block, or `null` when PayPal returns a type this SDK version does not recognize.
  * @property text The text to display, for example `"4 interest-free payments of $13.75 with "`.
  * @property alternativeText The screen reader text for blocks whose [text] relies on symbols or abbreviations.
- * @property clickUrl The URL to open when a link or image block is tapped.
- * @property sourceUrl The image to render for an image block.
+ * @property clickUrl The URL to open when a link or image block is tapped. `null` unless PayPal returns an https URL.
+ * @property sourceUrl The image to render for an image block. `null` unless PayPal returns an https URL.
  * @property name A non-unique identifier for the block, for example `"periodic_payment_count"` or `"paypal_logo"`.
  * @property isEmbeddable Whether [clickUrl] may be loaded in an embedded web view rather than an external browser.
  */
@@ -42,8 +43,8 @@ internal data class PayPalCreditMessageItem(
                 type = PayPalCreditMessageItemType.fromRawValue(Json.optString(json, TYPE_KEY, null)),
                 text = Json.optString(json, TEXT_KEY, null),
                 alternativeText = Json.optString(json, ALTERNATIVE_TEXT_KEY, null),
-                clickUrl = Json.optString(json, CLICK_URL_KEY, null),
-                sourceUrl = Json.optString(json, SOURCE_URL_KEY, null),
+                clickUrl = Json.optString(json, CLICK_URL_KEY, null).asHttpsUrlOrNull(),
+                sourceUrl = Json.optString(json, SOURCE_URL_KEY, null).asHttpsUrlOrNull(),
                 name = Json.optString(json, NAME_KEY, null),
                 isEmbeddable = if (json.isNull(EMBEDDABLE_KEY)) null else json.optBoolean(EMBEDDABLE_KEY)
             )
