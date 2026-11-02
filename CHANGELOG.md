@@ -11,6 +11,7 @@
 * SharedUtils
     * Add `sendRequestForBytes` to `HttpClient` for fetching binary payloads
 * PayPalSavedPaymentMethod (BETA)
+  * Add `PayPalSavedPaymentMethodView` Compose component that shows the buyer's saved PayPal funding instrument, with an optional Pay Later message, and lets the buyer change it in the PayPal paysheet
   * Add `PayPalSavedPaymentMethodView` XML view that shows the buyer's saved PayPal funding instrument, with an optional Pay Later message, and lets the buyer change it in the PayPal paysheet. Configurable with `paypalSavedPaymentMethod*` XML attributes
     * **Note:** This feature is currently in beta and may change or be removed in future releases.
 
