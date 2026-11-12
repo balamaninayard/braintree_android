@@ -119,15 +119,15 @@ class PayPalSavedPaymentMethodContentUnitTest {
     }
 
     @Test
-    fun `the logo is read as PayPal only when the label is hidden`() {
+    fun `the logo is read as PayPal logo and the label as PayPal`() {
         render(CARD)
         composeTestRule.onNodeWithText("PayPal").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("PayPal").assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription("PayPal logo").assertIsDisplayed()
 
         render(CARD, style = PayPalSavedPaymentMethodViewStyle(showPayPalLabel = false))
 
         composeTestRule.onNodeWithText("PayPal").assertDoesNotExist()
-        composeTestRule.onNodeWithContentDescription("PayPal").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("PayPal logo").assertIsDisplayed()
     }
 
     @Test
