@@ -2,12 +2,15 @@
 
 package com.braintreepayments.api.paypalsavedpaymentmethod.compose
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -22,6 +25,7 @@ import com.braintreepayments.api.paypal.PayPalCheckoutRequest
 import com.braintreepayments.api.paypal.PayPalPendingRequest
 import com.braintreepayments.api.paypal.PayPalResult
 import com.braintreepayments.api.paypalsavedpaymentmethod.PayPalSavedPaymentMethodRequest
+import com.braintreepayments.api.paypalsavedpaymentmethod.PayPalSavedPaymentMethodReturnResult
 import com.braintreepayments.api.paypalsavedpaymentmethod.PayPalSavedPaymentMethodViewModel
 import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethod
 import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethodType
@@ -30,13 +34,14 @@ import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalSavedPayme
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalSavedPaymentMethodUiState
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Rule
@@ -50,6 +55,7 @@ class PayPalSavedPaymentMethodViewUnitTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
+    private val restorationTester = StateRestorationTester(composeTestRule)
     private val state = MutableStateFlow(
         PayPalSavedPaymentMethodUiState(
             fundingInstrument = CARD_STATE,
@@ -58,18 +64,17 @@ class PayPalSavedPaymentMethodViewUnitTest {
     )
     private val results = MutableSharedFlow<PayPalResult>(extraBufferCapacity = 1)
     private val viewModel = mockk<PayPalSavedPaymentMethodViewModel>(relaxed = true)
-    private val pendingRequestRepository = mockk<PendingRequestRepository>(relaxed = true)
     private val authorizations = mutableListOf<String>()
     private val delivered = mutableListOf<PayPalResult>()
-    private val inputs = mutableStateOf(Inputs())
+    // Never equal, so setting equal inputs still recomposes, as a parent passing a new but equal request would.
+    private val inputs = mutableStateOf(Inputs(), neverEqualPolicy())
 
     @Before
     fun setUp() {
         every { viewModel.state } returns state
         every { viewModel.results } returns results
-        coEvery { pendingRequestRepository.get() } returns null
-        coEvery { pendingRequestRepository.store(any()) } returns true
-        composeTestRule.setContent {
+        every { viewModel.handleReturnToApp(any(), any(), any()) } returns PayPalSavedPaymentMethodReturnResult.TAKEN
+        restorationTester.setContent {
             val current = inputs.value
             PayPalSavedPaymentMethodView(
                 payPalCheckoutRequest = CHECKOUT,
@@ -88,8 +93,7 @@ class PayPalSavedPaymentMethodViewUnitTest {
                             return viewModel as T
                         }
                     }
-                },
-                createPendingRequestRepository = { pendingRequestRepository }
+                }
             )
         }
         composeTestRule.waitForIdle()
@@ -112,15 +116,40 @@ class PayPalSavedPaymentMethodViewUnitTest {
     }
 
     @Test
-    fun `a new authorization gets a new view model, the same one keeps it`() {
-        inputs.value = inputs.value.copy(request = PayPalSavedPaymentMethodRequest("20.00", "USD"))
+    fun `an equal request in a new instance doesn't reload the Pay Later message`() {
+        val equalRequest = PayPalSavedPaymentMethodRequest("10.00", "USD")
+        assertNotSame(REQUEST, equalRequest)
+
+        inputs.value = inputs.value.copy(request = equalRequest)
         composeTestRule.waitForIdle()
+
+        verify(exactly = 1) { viewModel.onRequestChanged(any(), any()) }
+    }
+
+    @Test
+    fun `a refreshed authorization keeps the view model, as on iOS`() {
+        inputs.value = inputs.value.copy(authorization = "refreshed-client-token")
+        composeTestRule.waitForIdle()
+
         assertEquals(listOf("client-token"), authorizations)
+        verify(exactly = 1) { viewModel.load(any(), any()) }
+    }
 
-        inputs.value = inputs.value.copy(authorization = "another-client-token")
+    @Test
+    fun `a refreshed authorization keeps the pending request, so the return is still completed`() {
+        coEvery { viewModel.startEdit(any(), any(), any()) } returns PayPalPendingRequest.Started("pending")
+        // Not taken the first time, so the pending request is still kept when the authorization changes.
+        every { viewModel.handleReturnToApp("pending", any(), any()) } returnsMany
+            listOf(PayPalSavedPaymentMethodReturnResult.NOT_TAKEN, PayPalSavedPaymentMethodReturnResult.TAKEN)
+        composeTestRule.onNodeWithTag(FUNDING_INSTRUMENT_CHIP_TEST_TAG).performClick()
         composeTestRule.waitForIdle()
+        resumeAgain()
 
-        assertEquals(listOf("client-token", "another-client-token"), authorizations)
+        inputs.value = inputs.value.copy(authorization = "refreshed-client-token")
+        composeTestRule.waitForIdle()
+        resumeAgain()
+
+        verify(exactly = 2) { viewModel.handleReturnToApp("pending", any(), any()) }
     }
 
     @Test
@@ -129,7 +158,6 @@ class PayPalSavedPaymentMethodViewUnitTest {
 
         composeTestRule.onNodeWithTag(FUNDING_INSTRUMENT_CHIP_TEST_TAG).performClick()
         composeTestRule.waitForIdle()
-        coVerify { pendingRequestRepository.store("pending") }
 
         resumeAgain()
 
@@ -148,7 +176,7 @@ class PayPalSavedPaymentMethodViewUnitTest {
     }
 
     @Test
-    fun `a result is delivered to the callback and clears the pending request`() {
+    fun `a result is delivered to the callback, and later resumes don't complete the return again`() {
         coEvery { viewModel.startEdit(any(), any(), any()) } returns PayPalPendingRequest.Started("pending")
         composeTestRule.onNodeWithTag(FUNDING_INSTRUMENT_CHIP_TEST_TAG).performClick()
         composeTestRule.waitForIdle()
@@ -158,8 +186,54 @@ class PayPalSavedPaymentMethodViewUnitTest {
         resumeAgain()
 
         assertEquals(listOf<PayPalResult>(PayPalResult.Cancel), delivered)
-        coVerify { pendingRequestRepository.clear() }
         verify(exactly = 0) { viewModel.handleReturnToApp(any(), any(), any()) }
+    }
+
+    @Test
+    fun `a pending request survives restoring the saved state, and the return is completed with it`() {
+        coEvery { viewModel.startEdit(any(), any(), any()) } returns PayPalPendingRequest.Started("pending")
+        composeTestRule.onNodeWithTag(FUNDING_INSTRUMENT_CHIP_TEST_TAG).performClick()
+        composeTestRule.waitForIdle()
+        verify(exactly = 0) { viewModel.handleReturnToApp(any(), any(), any()) }
+
+        // Only saved state keeps the pending request, so it must come back with it.
+        restorationTester.emulateSavedInstanceStateRestore()
+        composeTestRule.waitForIdle()
+
+        verify { viewModel.handleReturnToApp("pending", any(), any()) }
+    }
+
+    @Test
+    fun `a pending request the view model drops is passed again on the next resume, then forgotten`() {
+        coEvery { viewModel.startEdit(any(), any(), any()) } returns PayPalPendingRequest.Started("pending")
+        every { viewModel.handleReturnToApp("pending", any(), any()) } returnsMany
+            listOf(PayPalSavedPaymentMethodReturnResult.NOT_TAKEN, PayPalSavedPaymentMethodReturnResult.TAKEN)
+        composeTestRule.onNodeWithTag(FUNDING_INSTRUMENT_CHIP_TEST_TAG).performClick()
+        composeTestRule.waitForIdle()
+
+        resumeAgain()
+        resumeAgain()
+        resumeAgain()
+
+        verify(exactly = 2) { viewModel.handleReturnToApp("pending", any(), any()) }
+    }
+
+    @Test
+    fun `a completed return clears the PayPal return URL from the activity's intent`() {
+        coEvery { viewModel.startEdit(any(), any(), any()) } returns PayPalPendingRequest.Started("pending")
+        // The return URL arrives with the return. The activity's intent isn't replaced, since the test tracks the
+        // activity by it.
+        every { viewModel.handleReturnToApp("pending", any(), any()) } answers {
+            thirdArg<Intent?>()?.data = RETURN_URL.buildUpon().path("return").build()
+            PayPalSavedPaymentMethodReturnResult.COMPLETED
+        }
+        composeTestRule.onNodeWithTag(FUNDING_INSTRUMENT_CHIP_TEST_TAG).performClick()
+        composeTestRule.waitForIdle()
+
+        resumeAgain()
+
+        verify { viewModel.handleReturnToApp("pending", any(), composeTestRule.activity.intent) }
+        assertNull(composeTestRule.activity.intent.data)
     }
 
     @Test
