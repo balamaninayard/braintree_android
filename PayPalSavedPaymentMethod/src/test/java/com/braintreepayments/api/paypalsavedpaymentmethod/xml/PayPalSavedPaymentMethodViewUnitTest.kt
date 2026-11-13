@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
@@ -20,13 +21,14 @@ import com.braintreepayments.api.paypal.PayPalLauncher
 import com.braintreepayments.api.paypal.PayPalPendingRequest
 import com.braintreepayments.api.paypal.PayPalResult
 import com.braintreepayments.api.paypalsavedpaymentmethod.PayPalSavedPaymentMethodRequest
+import com.braintreepayments.api.paypalsavedpaymentmethod.PayPalSavedPaymentMethodReturnResult
 import com.braintreepayments.api.paypalsavedpaymentmethod.PayPalSavedPaymentMethodViewModel
 import com.braintreepayments.api.paypalsavedpaymentmethod.R
+import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethod
+import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethodType
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalCreditMessagingContent
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalCreditMessagingDisplayState
-import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethod
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalSavedPaymentMethodDisplayState
-import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethodType
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalSavedPaymentMethodUiState
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodViewStyle
 import io.mockk.coEvery
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -63,7 +66,8 @@ class PayPalSavedPaymentMethodViewUnitTest {
     init {
         every { viewModel.state } returns state
         every { viewModel.results } returns results
-        every { viewModel.attachView(any()) } returns true
+        every { viewModel.handleReturnToApp(any(), any(), any()) } returns
+            PayPalSavedPaymentMethodReturnResult.TAKEN
     }
 
     @Test
@@ -132,6 +136,31 @@ class PayPalSavedPaymentMethodViewUnitTest {
     }
 
     @Test
+    fun `handleReturnToApp tells the merchant whether to keep the pending request, and clears a used-up return URL`() {
+        initialize()
+        val pending = PayPalPendingRequest.Started("pending")
+        val returnUrl = RETURN_URL.buildUpon().path("return").build()
+
+        every { viewModel.handleReturnToApp(any(), any(), any()) } returns
+            PayPalSavedPaymentMethodReturnResult.NOT_TAKEN
+        val notTaken = Intent(Intent.ACTION_VIEW, returnUrl)
+        assertFalse(sut.handleReturnToApp(pending, notTaken))
+        assertEquals(returnUrl, notTaken.data)
+
+        every { viewModel.handleReturnToApp(any(), any(), any()) } returns
+            PayPalSavedPaymentMethodReturnResult.TAKEN
+        val taken = Intent(Intent.ACTION_VIEW, returnUrl)
+        assertTrue(sut.handleReturnToApp(pending, taken))
+        assertEquals(returnUrl, taken.data)
+
+        every { viewModel.handleReturnToApp(any(), any(), any()) } returns
+            PayPalSavedPaymentMethodReturnResult.COMPLETED
+        val completed = Intent(Intent.ACTION_VIEW, returnUrl)
+        assertTrue(sut.handleReturnToApp(pending, completed))
+        assertNull(completed.data)
+    }
+
+    @Test
     fun `handleReturnToApp does nothing before initialize`() {
         val taken = sut.handleReturnToApp(PayPalPendingRequest.Started("pending"), Intent())
 
@@ -151,6 +180,19 @@ class PayPalSavedPaymentMethodViewUnitTest {
         idle()
         assertFalse(ShadowDialog.getLatestDialog().isShowing)
         assertTrue(chip().isEnabled)
+    }
+
+    @Test
+    fun `a style change while detached during an edit doesn't open the loader again`() {
+        initialize()
+        state.value = PayPalSavedPaymentMethodUiState(fundingInstrument = CARD_STATE, isEditing = true)
+        idle()
+        activity.setContentView(View(activity))
+        val shown = ShadowDialog.getShownDialogs().size
+
+        sut.style = PayPalSavedPaymentMethodViewStyle(showPayPalCreditMessaging = false)
+
+        assertEquals(shown, ShadowDialog.getShownDialogs().size)
     }
 
     @Test
@@ -205,13 +247,16 @@ class PayPalSavedPaymentMethodViewUnitTest {
 
     @Test
     fun `an id another attached view already uses reports a failure and hides`() {
-        every { viewModel.isAttachedToAnotherView(any()) } returns true
+        initialize()
+        val first = sut
+        sut = PayPalSavedPaymentMethodView(activity).apply { id = first.id }
+        (first.parent as ViewGroup).addView(sut)
 
         initialize()
 
         assertEquals(true, failureMessage()?.startsWith("Another PayPalSavedPaymentMethodView"))
         assertFalse(sut.getChildAt(0).isVisible)
-        verify(exactly = 0) { viewModel.load(any(), any()) }
+        verify(exactly = 1) { viewModel.load(any(), any()) }
     }
 
     @Test
@@ -233,7 +278,8 @@ class PayPalSavedPaymentMethodViewUnitTest {
     @Test
     fun `initializing again keeps the launcher that opened the paysheet`() {
         val launchers = mutableListOf<PayPalLauncher>()
-        every { viewModel.handleReturnToApp(any(), capture(launchers), any()) } returns true
+        every { viewModel.handleReturnToApp(any(), capture(launchers), any()) } returns
+            PayPalSavedPaymentMethodReturnResult.TAKEN
         initialize()
         sut.handleReturnToApp(PayPalPendingRequest.Started("pending"), Intent())
 
@@ -244,15 +290,13 @@ class PayPalSavedPaymentMethodViewUnitTest {
     }
 
     @Test
-    fun `a new authorization gets a new view model, the same one keeps it`() {
+    fun `a refreshed authorization keeps the view model, as on iOS`() {
         initialize()
-        initialize()
+
+        initialize(authorization = "refreshed-client-token")
+
         assertEquals(1, createdViewModels)
-
-        initialize(authorization = "another-client-token")
-
-        assertEquals(2, createdViewModels)
-        assertEquals("another-client-token", authorizations.last())
+        assertEquals(listOf("client-token"), authorizations)
     }
 
     @Test
@@ -265,10 +309,9 @@ class PayPalSavedPaymentMethodViewUnitTest {
         idle()
 
         initialize()
-        initialize(authorization = "another-client-token")
         sut.handleReturnToApp(PayPalPendingRequest.Started("pending"), Intent())
 
-        assertEquals(listOf("client-token", "another-client-token"), authorizations)
+        assertEquals(listOf("client-token"), authorizations)
         verify { viewModel.handleReturnToApp("pending", any(), any()) }
     }
 

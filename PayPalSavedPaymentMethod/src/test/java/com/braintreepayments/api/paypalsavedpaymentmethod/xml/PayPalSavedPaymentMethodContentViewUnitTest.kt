@@ -3,17 +3,21 @@
 package com.braintreepayments.api.paypalsavedpaymentmethod.xml
 
 import android.content.Context
+import android.graphics.Rect
+import android.os.SystemClock
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
+import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
 import com.braintreepayments.api.core.ExperimentalBetaApi
 import com.braintreepayments.api.paypalsavedpaymentmethod.R
+import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethod
+import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethodType
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalCreditMessagingContent
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalCreditMessagingDisplayState
-import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethod
 import com.braintreepayments.api.paypalsavedpaymentmethod.state.PayPalSavedPaymentMethodDisplayState
-import com.braintreepayments.api.paypalsavedpaymentmethod.model.PayPalSavedPaymentMethodType
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLabelStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalLogoStyle
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodContainerStyle
@@ -25,8 +29,10 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class PayPalSavedPaymentMethodContentViewUnitTest {
@@ -104,15 +110,41 @@ class PayPalSavedPaymentMethodContentViewUnitTest {
             )
         )
         render(CARD_STATE, MESSAGE_STATE, style = style)
+        layOut()
         assertEquals(48f.dpToPx(context.resources), logo.layoutParams.width)
         assertEquals(48f.dpToPx(context.resources), logo.layoutParams.height)
         assertEquals(6f.dpToPx(context.resources), label.paddingStart)
         assertEquals(54f.dpToPx(context.resources), (creditMessaging.layoutParams as MarginLayoutParams).marginStart)
 
         render(CARD_STATE, MESSAGE_STATE, style = PayPalSavedPaymentMethodViewStyle(showPayPalLogo = false))
+        layOut()
         assertFalse(logo.isVisible)
         assertEquals(0, label.paddingStart)
         assertEquals(0, (creditMessaging.layoutParams as MarginLayoutParams).marginStart)
+    }
+
+    @Test
+    fun `with the logo shown and the label hidden, Pay Later lines up with the chip`() {
+        render(CARD_STATE, MESSAGE_STATE, style = LOGO_ONLY)
+
+        layOut()
+
+        assertEquals(startInContent(chip), startInContent(creditMessaging))
+    }
+
+    @Test
+    fun `with the label hidden and the chip stacked, Pay Later starts at the leading edge with the chip`() {
+        // A logo almost as wide as the view leaves no room beside it, so the chip stacks below.
+        val wideLogo = PayPalSavedPaymentMethodViewStyle(
+            showPayPalLabel = false,
+            container = PayPalSavedPaymentMethodContainerStyle(logo = PayPalLogoStyle(widthDp = 260f))
+        )
+        render(CARD_STATE, MESSAGE_STATE, style = wideLogo)
+
+        layOut(width = NARROW_WIDTH)
+
+        assertEquals(sut.paddingStart, startInContent(chip))
+        assertEquals(startInContent(chip), startInContent(creditMessaging))
     }
 
     @Test
@@ -136,6 +168,59 @@ class PayPalSavedPaymentMethodContentViewUnitTest {
         assertEquals(80f.dpToPx(context.resources), sut.minimumHeight)
     }
 
+    // A dense screen, where the chip's dp size is well above 48 pixels.
+    @Config(qualifiers = "xxhdpi")
+    @Test
+    fun `tapping just outside an editable chip still edits, up to a 48dp touch target`() {
+        var edits = 0
+        sut.onEditClick = { edits++ }
+        // Attached, since the chip posts its click.
+        Robolectric.buildActivity(ComponentActivity::class.java).setup().get().setContentView(sut)
+        render(CARD_STATE)
+        layOut()
+        val chipBounds = Rect(0, 0, chip.width, chip.height).also { sut.offsetDescendantRectToMyCoords(chip, it) }
+        val minSize = 48f.dpToPx(context.resources)
+        assertTrue("the chip is smaller than the target", chipBounds.height() < minSize)
+        val x = chipBounds.centerX().toFloat()
+
+        tap(x, chipBounds.top - 2f)
+        assertEquals(1, edits)
+        // Beyond the 48dp target, nothing happens.
+        tap(x, chipBounds.centerY() - minSize / 2f - 2f)
+        assertEquals(1, edits)
+    }
+
+    @Test
+    fun `there is no touch target when the chip is hidden`() {
+        render(CARD_STATE)
+        layOut()
+        assertTrue(sut.touchDelegate != null)
+
+        render(PayPalSavedPaymentMethodDisplayState.Error)
+        layOut()
+
+        assertNull(sut.touchDelegate)
+    }
+
+    // Where [view] starts within the content view.
+    private fun startInContent(view: View): Int =
+        Rect(0, 0, view.width, view.height).also { sut.offsetDescendantRectToMyCoords(view, it) }.left
+
+    private fun layOut(width: Int = 1080) {
+        sut.measure(
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        sut.layout(0, 0, sut.measuredWidth, sut.measuredHeight)
+    }
+
+    private fun tap(x: Float, y: Float) {
+        val time = SystemClock.uptimeMillis()
+        sut.dispatchTouchEvent(MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN, x, y, 0))
+        sut.dispatchTouchEvent(MotionEvent.obtain(time, time + 10, MotionEvent.ACTION_UP, x, y, 0))
+        idle()
+    }
+
     private fun render(
         fundingInstrumentState: PayPalSavedPaymentMethodDisplayState,
         creditMessagingState: PayPalCreditMessagingDisplayState = PayPalCreditMessagingDisplayState.Hidden,
@@ -153,6 +238,8 @@ class PayPalSavedPaymentMethodContentViewUnitTest {
         val CARD_STATE = PayPalSavedPaymentMethodDisplayState.Content(
             PayPalSavedPaymentMethod(PayPalSavedPaymentMethodType.CARD, "Visa", null, "1234", null)
         )
+        const val NARROW_WIDTH = 300
+        val LOGO_ONLY = PayPalSavedPaymentMethodViewStyle(showPayPalLabel = false)
         val MESSAGE_STATE = PayPalCreditMessagingDisplayState.Content(
             PayPalCreditMessagingContent("Pay in 4.", learnMore = null)
         )
