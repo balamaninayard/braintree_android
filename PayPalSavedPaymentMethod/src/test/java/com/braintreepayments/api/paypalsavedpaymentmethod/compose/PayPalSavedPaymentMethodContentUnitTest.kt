@@ -33,6 +33,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -67,7 +68,6 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.GraphicsMode
 import java.io.IOException
-import kotlin.math.abs
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -154,11 +154,11 @@ class PayPalSavedPaymentMethodContentUnitTest {
     @Test
     fun `the Pay Later message lines up with the label, or the leading edge when the logo is hidden`() {
         render(CARD, MESSAGE)
-        assertTrue(abs(bounds(CREDIT_MESSAGING_TEST_TAG).left - textBounds("PayPal").left) <= 1f)
+        assertEquals(bounds(CREDIT_MESSAGING_TEST_TAG).left, textBounds("PayPal").left, 1f)
 
         render(CARD, MESSAGE, style = PayPalSavedPaymentMethodViewStyle(showPayPalLogo = false))
 
-        assertTrue(abs(bounds(CREDIT_MESSAGING_TEST_TAG).left - bounds(BRAND_MARK_TEST_TAG).left) <= 1f)
+        assertEquals(bounds(CREDIT_MESSAGING_TEST_TAG).left, bounds(BRAND_MARK_TEST_TAG).left, 1f)
     }
 
     @Test
@@ -194,12 +194,24 @@ class PayPalSavedPaymentMethodContentUnitTest {
     fun `the Pay Later message opens its Learn more link`() {
         render(CARD, MESSAGE)
 
-        val text = composeTestRule.onNodeWithText("Pay in 4. Learn more")
-            .fetchSemanticsNode().config[SemanticsProperties.Text].single()
-        val link = text.getLinkAnnotations(0, text.length).single().item as LinkAnnotation.Clickable
+        val link = learnMoreLink()
         link.linkInteractionListener?.onClick(link)
 
-        assertEquals(listOf("https://www.paypal.com/learn-more"), openedUrls)
+        assertEquals(listOf(URL), openedUrls)
+    }
+
+    @Test
+    fun `screen readers read the Pay Later message as one element whose action opens Learn more`() {
+        render(CARD, MESSAGE)
+
+        composeTestRule.onNodeWithTag(CREDIT_MESSAGING_TEST_TAG)
+            .assert(SemanticsMatcher("has no separate link to focus") { it.children.isEmpty() })
+            .assert(SemanticsMatcher("has the Learn more action") {
+                it.config.getOrNull(SemanticsActions.OnClick)?.label == "Learn more"
+            })
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertEquals(listOf(URL), openedUrls)
     }
 
     @Test
@@ -218,7 +230,7 @@ class PayPalSavedPaymentMethodContentUnitTest {
         val brand = bounds(BRAND_MARK_TEST_TAG)
         val chip = bounds(FUNDING_INSTRUMENT_CHIP_TEST_TAG)
         assertTrue(chip.left >= brand.right)
-        assertTrue(abs(chip.center.y - brand.center.y) <= 1f)
+        assertEquals(chip.center.y, brand.center.y, 1f)
 
         render(CARD, width = WIDE, layoutDirection = LayoutDirection.Rtl)
 
@@ -234,7 +246,8 @@ class PayPalSavedPaymentMethodContentUnitTest {
         assertTrue(chip.top >= brand.bottom)
         assertTrue(chip.left <= brand.left + 1f)
 
-        render(PayPalSavedPaymentMethodDisplayState.Loading, width = NARROW)
+        // Too narrow for the brand, the gap and the shimmer's own width, so it would stack if it could.
+        render(PayPalSavedPaymentMethodDisplayState.Loading, width = TOO_NARROW_FOR_SHIMMER)
 
         assertTrue(bounds(FUNDING_INSTRUMENT_SHIMMER_TEST_TAG).left >= bounds(BRAND_MARK_TEST_TAG).right)
     }
@@ -243,7 +256,7 @@ class PayPalSavedPaymentMethodContentUnitTest {
     fun `with the logo shown and the label hidden, the Pay Later message lines up with the chip`() {
         render(CARD, MESSAGE, style = LOGO_ONLY)
 
-        assertTrue(abs(bounds(CREDIT_MESSAGING_TEST_TAG).left - bounds(FUNDING_INSTRUMENT_CHIP_TEST_TAG).left) <= 1f)
+        assertEquals(bounds(CREDIT_MESSAGING_TEST_TAG).left, bounds(FUNDING_INSTRUMENT_CHIP_TEST_TAG).left, 1f)
     }
 
     @Test
@@ -252,7 +265,7 @@ class PayPalSavedPaymentMethodContentUnitTest {
 
         val chip = bounds(FUNDING_INSTRUMENT_CHIP_TEST_TAG)
         assertTrue(chip.top >= bounds(BRAND_MARK_TEST_TAG).bottom)
-        assertTrue(abs(bounds(CREDIT_MESSAGING_TEST_TAG).left - chip.left) <= 1f)
+        assertEquals(bounds(CREDIT_MESSAGING_TEST_TAG).left, chip.left, 1f)
     }
 
     @Test
@@ -265,7 +278,7 @@ class PayPalSavedPaymentMethodContentUnitTest {
 
         val shimmerStart = bounds(BRAND_MARK_TEST_TAG).right +
             dimenDp(R.dimen.paypal_saved_payment_method_style_default_funding_instrument_margin_start)
-        assertTrue(abs(bounds(CREDIT_MESSAGING_TEST_TAG).left - shimmerStart) <= 1f)
+        assertEquals(bounds(CREDIT_MESSAGING_TEST_TAG).left, shimmerStart, 1f)
     }
 
     @Test
@@ -331,10 +344,8 @@ class PayPalSavedPaymentMethodContentUnitTest {
         composeTestRule.setContent {
             FundingInstrumentChip(
                 state = withArt,
-                resolvedStyle = PayPalSavedPaymentMethodStyleResolver(
-                    LocalContext.current,
-                    PayPalSavedPaymentMethodViewStyle()
-                ),
+                resolvedStyle =
+                    PayPalSavedPaymentMethodStyleResolver(LocalContext.current, PayPalSavedPaymentMethodViewStyle()),
                 editEnabled = true,
                 onEditClick = {},
                 imageLoader = imageLoader
@@ -354,13 +365,7 @@ class PayPalSavedPaymentMethodContentUnitTest {
     ) {
         val isFirstRender = content.value == null
         content.value = Content(
-            fundingInstrumentState,
-            creditMessagingState,
-            style,
-            isEditCompleted,
-            editEnabled,
-            width,
-            layoutDirection
+            fundingInstrumentState, creditMessagingState, style, isEditCompleted, editEnabled, width, layoutDirection
         )
         if (isFirstRender) {
             composeTestRule.setContent {
@@ -383,12 +388,13 @@ class PayPalSavedPaymentMethodContentUnitTest {
         composeTestRule.mainClock.advanceTimeByFrame()
     }
 
-    private fun learnMoreLinkStyle(): SpanStyle {
+    private fun learnMoreLink(): LinkAnnotation.Clickable {
         val text = composeTestRule.onNodeWithText("Pay in 4. Learn more")
             .fetchSemanticsNode().config[SemanticsProperties.Text].single()
-        val link = text.getLinkAnnotations(0, text.length).single().item as LinkAnnotation.Clickable
-        return checkNotNull(link.styles?.style)
+        return text.getLinkAnnotations(0, text.length).single().item as LinkAnnotation.Clickable
     }
+
+    private fun learnMoreLinkStyle(): SpanStyle = checkNotNull(learnMoreLink().styles?.style)
 
     private fun appearance(@ColorInt textColor: Int) = PayPalSavedPaymentMethodAppearance(textColor = textColor)
 
@@ -418,7 +424,9 @@ class PayPalSavedPaymentMethodContentUnitTest {
     private companion object {
         const val WIDE = 600
         const val NARROW = 240
+        const val TOO_NARROW_FOR_SHIMMER = 150
         val LOGO_ONLY = PayPalSavedPaymentMethodViewStyle(showPayPalLabel = false)
+        const val URL = "https://www.paypal.com/learn-more"
         const val ART_URL = "https://www.paypalobjects.com/images/visa.png"
         const val TEXT_COLOR = AndroidColor.RED
         const val LINK_COLOR = AndroidColor.BLUE
@@ -433,14 +441,7 @@ class PayPalSavedPaymentMethodContentUnitTest {
             isEditable = true
         )
         val MESSAGE = PayPalCreditMessagingDisplayState.Content(
-            PayPalCreditMessagingContent(
-                "Pay in 4.",
-                PayPalCreditMessagingContent.LearnMore(
-                    "Learn more",
-                    "https://www.paypal.com/learn-more",
-                    isEmbeddable = false
-                )
-            )
+            PayPalCreditMessagingContent("Pay in 4.", PayPalCreditMessagingContent.LearnMore("Learn more", URL, false))
         )
     }
 }
