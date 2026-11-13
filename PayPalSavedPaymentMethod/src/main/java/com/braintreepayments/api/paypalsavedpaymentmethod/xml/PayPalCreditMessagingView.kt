@@ -51,7 +51,7 @@ internal class PayPalCreditMessagingView @JvmOverloads constructor(
     fun bind(
         state: PayPalCreditMessagingDisplayState,
         resolvedStyle: PayPalSavedPaymentMethodStyleResolver,
-        onLearnMoreClick: (url: String) -> Unit
+        onLearnMoreClick: (PayPalCreditMessagingContent.LearnMore) -> Unit
     ) {
         isVisible = state != PayPalCreditMessagingDisplayState.Hidden
         shimmerView.isVisible = state == PayPalCreditMessagingDisplayState.Loading
@@ -71,7 +71,7 @@ internal class PayPalCreditMessagingView @JvmOverloads constructor(
     // the link isn't announced as something to double tap.
     private fun bindAccessibilityClick(
         learnMore: PayPalCreditMessagingContent.LearnMore?,
-        onLearnMoreClick: (url: String) -> Unit
+        onLearnMoreClick: (PayPalCreditMessagingContent.LearnMore) -> Unit
     ) {
         textView.isClickable = learnMore != null
         // The movement method made the text focusable; only a message with the link is a keyboard or D-pad stop.
@@ -82,7 +82,7 @@ internal class PayPalCreditMessagingView @JvmOverloads constructor(
                 AccessibilityActionCompat.ACTION_CLICK,
                 learnMore.text
             ) { _, _ ->
-                onLearnMoreClick(learnMore.url)
+                onLearnMoreClick(learnMore)
                 true
             }
         } else {
@@ -95,7 +95,7 @@ internal class PayPalCreditMessagingView @JvmOverloads constructor(
 private fun PayPalCreditMessagingContent.toSpannable(
     @ColorInt linkColor: Int?,
     @ColorInt textColor: Int,
-    onLearnMoreClick: (String) -> Unit
+    onLearnMoreClick: (PayPalCreditMessagingContent.LearnMore) -> Unit
 ): CharSequence {
     val builder = SpannableStringBuilder(message)
     val link = learnMore
@@ -104,7 +104,7 @@ private fun PayPalCreditMessagingContent.toSpannable(
         val start = builder.length
         builder.append(link.text)
         val linkSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) = onLearnMoreClick(link.url)
+            override fun onClick(widget: View) = onLearnMoreClick(link)
 
             override fun updateDrawState(textPaint: TextPaint) {
                 textPaint.color = linkColor ?: textColor
