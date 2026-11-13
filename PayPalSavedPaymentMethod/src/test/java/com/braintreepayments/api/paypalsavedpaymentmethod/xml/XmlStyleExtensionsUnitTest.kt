@@ -5,6 +5,7 @@ package com.braintreepayments.api.paypalsavedpaymentmethod.xml
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
@@ -19,8 +20,6 @@ import io.mockk.unmockkStatic
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,12 +32,8 @@ import org.robolectric.annotation.GraphicsMode
 class XmlStyleExtensionsUnitTest {
 
     private val context: Context = RuntimeEnvironment.getApplication()
-    private val resolvedStyle = PayPalSavedPaymentMethodStyleResolver(
-        context,
-        PayPalSavedPaymentMethodViewStyle(
-            componentAppearance = PayPalSavedPaymentMethodAppearance(textColor = Color.RED)
-        )
-    )
+    private val resolvedStyle = styleWith(PayPalSavedPaymentMethodAppearance(textColor = Color.RED))
+    private val textView = TextView(context)
 
     @After
     fun tearDown() {
@@ -54,26 +49,26 @@ class XmlStyleExtensionsUnitTest {
 
     @Test
     @Config(qualifiers = "ldpi")
-    fun `dpToPx rounds, so a thin border isn't lost on a low density screen`() {
+    fun `dpToPx keeps a thin border at least one pixel on a low density screen`() {
         assertEquals(1, 1f.dpToPx(context.resources))
+        // 0.5dp is 0.375px on ldpi, which rounds to 0.
+        assertEquals(1, 0.5f.dpToPx(context.resources))
     }
 
     @Test
     fun `applyTextStyle sets the text color, the size in sp and the system font`() {
-        val textView = TextView(context)
-
         textView.applyTextStyle(resolvedStyle, sizeSp = 14f)
 
         assertEquals(Color.RED, textView.currentTextColor)
-        assertEquals(14f, textView.textSize / context.resources.displayMetrics.scaledDensity, DELTA)
+        val expectedSizePx =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, context.resources.displayMetrics)
+        assertEquals(expectedSizePx, textView.textSize, DELTA)
         assertEquals(Typeface.DEFAULT, textView.typeface)
     }
 
     @Test
     fun `applyTextStyle uses the medium system font for medium text`() {
-        val textView = TextView(context)
-
-        textView.applyTextStyle(resolvedStyle, sizeSp = 20f, medium = true)
+        textView.applyTextStyle(resolvedStyle, sizeSp = 20f, weight = TextWeight.MEDIUM)
 
         assertEquals(Typeface.create("sans-serif-medium", Typeface.NORMAL), textView.typeface)
     }
@@ -81,7 +76,6 @@ class XmlStyleExtensionsUnitTest {
     @Test
     fun `applyTextStyle uses the merchant's font as is for regular text`() {
         val font = givenMerchantFont()
-        val textView = TextView(context)
 
         textView.applyTextStyle(merchantFontStyle(), sizeSp = 14f)
 
@@ -89,56 +83,30 @@ class XmlStyleExtensionsUnitTest {
     }
 
     @Test
-    @Config(sdk = [28])
+    @Config(sdk = [Build.VERSION_CODES.P])
     @GraphicsMode(GraphicsMode.Mode.NATIVE)
     fun `applyTextStyle uses the merchant's font at medium weight on Android 9 and later`() {
         val font = givenMerchantFont()
-        val textView = TextView(context)
 
-        textView.applyTextStyle(merchantFontStyle(), sizeSp = 20f, medium = true)
+        textView.applyTextStyle(merchantFontStyle(), sizeSp = 20f, weight = TextWeight.MEDIUM)
 
         assertNotEquals(font, textView.typeface)
         assertEquals(500, textView.typeface.weight)
     }
 
     @Test
-    @Config(sdk = [27])
+    @Config(sdk = [Build.VERSION_CODES.O_MR1])
     fun `applyTextStyle keeps the merchant's font for medium text before Android 9`() {
         val font = givenMerchantFont()
-        val textView = TextView(context)
 
-        textView.applyTextStyle(merchantFontStyle(), sizeSp = 20f, medium = true)
+        textView.applyTextStyle(merchantFontStyle(), sizeSp = 20f, weight = TextWeight.MEDIUM)
 
         assertSame(font, textView.typeface)
     }
 
     @Test
-    fun `drawableOrNull loads the drawable a theme attribute points to`() {
-        val value = TypedValue().apply { resourceId = R.drawable.ic_edit_pencil }
-
-        assertNotNull(value.drawableOrNull(context))
-    }
-
-    @Test
-    fun `drawableOrNull returns null instead of crashing for a theme attribute set to a plain color`() {
-        val value = TypedValue().apply {
-            type = TypedValue.TYPE_INT_COLOR_ARGB8
-            data = Color.GRAY
-            resourceId = 0
-        }
-
-        assertNull(value.drawableOrNull(context))
-    }
-
-    @Test
     fun `applyTextStyle falls back to the system font when the font resource isn't a font`() {
-        val notAFont = PayPalSavedPaymentMethodStyleResolver(
-            context,
-            PayPalSavedPaymentMethodViewStyle(
-                componentAppearance = PayPalSavedPaymentMethodAppearance(fontResId = R.drawable.ic_edit_pencil)
-            )
-        )
-        val textView = TextView(context)
+        val notAFont = styleWith(PayPalSavedPaymentMethodAppearance(fontResId = R.drawable.ic_edit_pencil))
 
         textView.applyTextStyle(notAFont, sizeSp = 14f)
 
@@ -147,8 +115,6 @@ class XmlStyleExtensionsUnitTest {
 
     @Test
     fun `applyTextStyle uses the given text color instead of the style's`() {
-        val textView = TextView(context)
-
         textView.applyTextStyle(resolvedStyle, sizeSp = 14f, textColor = Color.BLUE)
 
         assertEquals(Color.BLUE, textView.currentTextColor)
@@ -161,11 +127,11 @@ class XmlStyleExtensionsUnitTest {
         return font
     }
 
-    private fun merchantFontStyle() = PayPalSavedPaymentMethodStyleResolver(
+    private fun merchantFontStyle() = styleWith(PayPalSavedPaymentMethodAppearance(fontResId = FONT_RES))
+
+    private fun styleWith(appearance: PayPalSavedPaymentMethodAppearance) = PayPalSavedPaymentMethodStyleResolver(
         context,
-        PayPalSavedPaymentMethodViewStyle(
-            componentAppearance = PayPalSavedPaymentMethodAppearance(fontResId = FONT_RES)
-        )
+        PayPalSavedPaymentMethodViewStyle(componentAppearance = appearance)
     )
 
     private companion object {

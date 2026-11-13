@@ -1,46 +1,43 @@
 package com.braintreepayments.api.paypalsavedpaymentmethod.xml
 
-import android.content.Context
 import android.content.res.Resources
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.FontRes
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.braintreepayments.api.paypalsavedpaymentmethod.styling.PayPalSavedPaymentMethodStyleResolver
 import kotlin.math.roundToInt
 
-/** Converts a dp value from the style resolver to whole pixels, rounded so a thin border never disappears. */
-internal fun Float.dpToPx(resources: Resources): Int =
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, resources.displayMetrics).roundToInt()
-
 /**
- * The drawable a resolved theme attribute points to, or `null` when it has no resource ID. A theme can set an attribute
- * such as `selectableItemBackground` to a plain color, and loading resource ID 0 would crash.
+ * Converts a dp value from the style resolver to whole pixels. A positive value is at least 1 pixel, so a thin border
+ * never disappears on a low density screen.
  */
-internal fun TypedValue.drawableOrNull(context: Context): Drawable? =
-    if (resourceId != 0) ContextCompat.getDrawable(context, resourceId) else null
+internal fun Float.dpToPx(resources: Resources): Int {
+    val px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, resources.displayMetrics).roundToInt()
+    return if (this > 0f) px.coerceAtLeast(1) else px
+}
+
+/** The weight of a text element. A custom font only gets [MEDIUM] on Android 9 and later. */
+internal enum class TextWeight { REGULAR, MEDIUM }
 
 /**
- * Applies the merchant's font, or the system font, at [sizeSp] in [textColor], the style's text color by default.
- * [medium] uses the medium weight, which a custom font only gets on Android 9 and later. A font resource that can't be
- * loaded falls back to the system font.
+ * Applies the merchant's font, or the system font, at [sizeSp] and [weight] in [textColor], the style's text color by
+ * default. A font resource that can't be loaded falls back to the system font.
  */
 internal fun TextView.applyTextStyle(
     resolvedStyle: PayPalSavedPaymentMethodStyleResolver,
     sizeSp: Float,
-    medium: Boolean = false,
+    weight: TextWeight = TextWeight.REGULAR,
     @ColorInt textColor: Int = resolvedStyle.textColor
 ) {
     setTextColor(textColor)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp)
     val font = resolvedStyle.fontResId?.let { fontOrNull(it) }
     typeface = when {
-        !medium -> font ?: Typeface.DEFAULT
+        weight == TextWeight.REGULAR -> font ?: Typeface.DEFAULT
         font == null -> Typeface.create(SYSTEM_MEDIUM_FONT_FAMILY, Typeface.NORMAL)
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> Typeface.create(font, MEDIUM_WEIGHT, false)
         else -> font
